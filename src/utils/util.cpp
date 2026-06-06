@@ -1,5 +1,5 @@
-#include "json_util.h"
-#include "util.h"
+#include "utils/util.h"
+#include "utils/json_util.h"
 #include <algorithm>
 #include <arpa/inet.h>
 #include <cstring>
@@ -416,11 +416,10 @@ bool jsonToYaml(Json::Value const& jnode, YAML::Node& ynode) {
 std::string PBToJsonString(google::protobuf::Message const& message) {
 	Json::Value jnode;
 	serializeMessage(message, jnode);
-	return JsonUtil::ToString(jnode);
+	return JsonUtil::toString(jnode);
 }
 
-bool readFixFromStreamWithSpeed(std::ifstream &is, char *data,
-                                uint64_t const &size, uint64_t const &speed) {
+bool readFixFromStreamWithSpeed(std::ifstream& is, char* data, uint64_t const& size, uint64_t const& speed) {
 	SpeedLimit::ptr limit;
 	if(dynamic_cast<std::ifstream*>(&is)) {
 		limit.reset(new SpeedLimit(speed));
@@ -440,8 +439,10 @@ bool readFixFromStreamWithSpeed(std::ifstream &is, char *data,
 	return offset == size;
 }
 
-bool writeFixToStreamWithSpeed(std::ofstream &os, char const *data,
-                               uint64_t const &size, uint64_t const &speed) {
+bool writeFixToStreamWithSpeed(std::ofstream&  os,
+							   char const*	   data,
+							   uint64_t const& size,
+							   uint64_t const& speed) {
 	SpeedLimit::ptr limit;
 	if(dynamic_cast<std::ofstream*>(&os)) {
 		limit.reset(new SpeedLimit(speed));

@@ -193,9 +193,12 @@ bool writeToStreamWithSpeed(std::ostream&	os,
 	return false;
 }
 
-bool readFixFromStreamWithSpeed(std::ifstream& is, char* data, uint64_t const& size, uint64_t const& speed = -1);
+bool readFixFromStreamWithSpeed(std::ifstream&	is,
+								char*			data,
+								uint64_t const& size,
+								uint64_t const& speed = -1);
 
-bool writeFixToStreamWithSpeed(std::ofstream&	   os,
+bool writeFixToStreamWithSpeed(std::ofstream&  os,
 							   char const*	   data,
 							   uint64_t const& size,
 							   uint64_t const& speed = -1);
@@ -440,6 +443,5 @@ void Slice(std::vector<std::vector<T>>& dst, const std::vector<T>& src, size_t s
 		dst.push_back(tmp);
 	}
 }
-
 
 }  // namespace azzato

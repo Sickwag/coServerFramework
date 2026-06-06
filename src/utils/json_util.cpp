@@ -1,9 +1,8 @@
-#include "json_util.h"
-#include "util.h"
-
+#include "utils/json_util.h"
+#include "utils/util.h"
 namespace azzato {
 
-bool JsonUtil::NeedEscape(const std::string& v) {
+bool JsonUtil::needEscape(const std::string& v) {
 	for(auto& c : v) {
 		switch(c) {
 		case '\f':
@@ -21,7 +20,7 @@ bool JsonUtil::NeedEscape(const std::string& v) {
 	return false;
 }
 
-std::string JsonUtil::Escape(const std::string& v) {
+std::string JsonUtil::escape(const std::string& v) {
 	size_t size = 0;
 	for(auto& c : v) {
 		switch(c) {
@@ -77,7 +76,7 @@ std::string JsonUtil::Escape(const std::string& v) {
 }
 
 std::string
-JsonUtil::GetString(const Json::Value& json, const std::string& name, const std::string& default_value) {
+JsonUtil::etString(const Json::Value& json, const std::string& name, const std::string& default_value) {
 	if(!json.isMember(name)) {
 		return default_value;
 	}
@@ -88,7 +87,7 @@ JsonUtil::GetString(const Json::Value& json, const std::string& name, const std:
 	return default_value;
 }
 
-double JsonUtil::GetDouble(const Json::Value& json, const std::string& name, double default_value) {
+double JsonUtil::getDouble(const Json::Value& json, const std::string& name, double default_value) {
 	if(!json.isMember(name)) {
 		return default_value;
 	}
@@ -101,7 +100,7 @@ double JsonUtil::GetDouble(const Json::Value& json, const std::string& name, dou
 	return default_value;
 }
 
-int32_t JsonUtil::GetInt32(const Json::Value& json, const std::string& name, int32_t default_value) {
+int32_t JsonUtil::getInt32(const Json::Value& json, const std::string& name, int32_t default_value) {
 	if(!json.isMember(name)) {
 		return default_value;
 	}
@@ -114,7 +113,7 @@ int32_t JsonUtil::GetInt32(const Json::Value& json, const std::string& name, int
 	return default_value;
 }
 
-uint32_t JsonUtil::GetUint32(const Json::Value& json, const std::string& name, uint32_t default_value) {
+uint32_t JsonUtil::getUint32(const Json::Value& json, const std::string& name, uint32_t default_value) {
 	if(!json.isMember(name)) {
 		return default_value;
 	}
@@ -127,7 +126,7 @@ uint32_t JsonUtil::GetUint32(const Json::Value& json, const std::string& name, u
 	return default_value;
 }
 
-int64_t JsonUtil::GetInt64(const Json::Value& json, const std::string& name, int64_t default_value) {
+int64_t JsonUtil::getInt64(const Json::Value& json, const std::string& name, int64_t default_value) {
 	if(!json.isMember(name)) {
 		return default_value;
 	}
@@ -140,7 +139,7 @@ int64_t JsonUtil::GetInt64(const Json::Value& json, const std::string& name, int
 	return default_value;
 }
 
-uint64_t JsonUtil::GetUint64(const Json::Value& json, const std::string& name, uint64_t default_value) {
+uint64_t JsonUtil::getUint64(const Json::Value& json, const std::string& name, uint64_t default_value) {
 	if(!json.isMember(name)) {
 		return default_value;
 	}
@@ -153,14 +152,14 @@ uint64_t JsonUtil::GetUint64(const Json::Value& json, const std::string& name, u
 	return default_value;
 }
 
-bool JsonUtil::FromString(Json::Value& json, const std::string& v) {
+bool JsonUtil::fromString(Json::Value& json, const std::string& v) {
 	Json::CharReaderBuilder			  builder;
 	std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
 	std::string						  errors;
 	return reader->parse(v.c_str(), v.c_str() + v.size(), &json, &errors);
 }
 
-std::string JsonUtil::ToString(const Json::Value& json) {
+std::string JsonUtil::toString(const Json::Value& json) {
 	Json::StreamWriterBuilder builder;
 	builder["indentation"] = "";
 	return Json::writeString(builder, json);
