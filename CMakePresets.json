@@ -1,0 +1,106 @@
+{
+	"version": 6,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 25,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "defaults",
+			"hidden": true,
+			"description": "Default build options",
+			"cacheVariables": {
+				"CMAKE_CXX_STANDARD": "20",
+				"CMAKE_CXX_STANDARD_REQUIRED": true,
+				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
+				"BUILD_TEST": "ON",
+				"EXECUTABLE_OUTPUT_PATH": "${sourceDir}/bin",
+				"LIBRARY_OUTPUT_PATH": "${sourceDir}/lib",
+				"HIREDIS_VIP_DIR": "/home/azzato/Programs/dependencies/hiredis-vip"
+			}
+		},
+		{
+			"name": "base-debug",
+			"hidden": true,
+			"description": "Base debug config",
+			"inherits": "defaults",
+			"binaryDir": "${sourceDir}/out/build/debug",
+			"installDir": "${sourceDir}/out/install/debug",
+			"toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "base-release",
+			"hidden": true,
+			"description": "Base release config",
+			"inherits": "defaults",
+			"binaryDir": "${sourceDir}/out/build/release",
+			"installDir": "${sourceDir}/out/install/release",
+			"toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "debug",
+			"displayName": "Debug",
+			"description": "Debug build",
+			"inherits": "base-debug",
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "-g -O0"
+			}
+		},
+		{
+			"name": "release",
+			"displayName": "Release",
+			"description": "Release build",
+			"inherits": "base-release",
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "-O3"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "debug",
+			"displayName": "Debug Build",
+			"configurePreset": "debug"
+		},
+		{
+			"name": "release",
+			"displayName": "Release Build",
+			"configurePreset": "release"
+		}
+	],
+	"testPresets": [
+		{
+			"name": "base-test",
+			"hidden": true,
+			"output": {
+				"outputOnFailure": true,
+				"verbosity": "default"
+			},
+			"execution": {
+				"noTestsAction": "error",
+				"stopOnFailure": false
+			}
+		},
+		{
+			"name": "debug",
+			"displayName": "Debug Test",
+			"description": "Run tests with Debug build",
+			"inherits": "base-test",
+			"configurePreset": "debug"
+		},
+		{
+			"name": "release",
+			"displayName": "Release Test",
+			"description": "Run tests with Release build",
+			"inherits": "base-test",
+			"configurePreset": "release"
+		}
+	]
+}
