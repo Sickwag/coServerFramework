@@ -1,6 +1,7 @@
 #pragma once
 
 #include <assert.h>
+#include "util.h"
 
 #if defined __GNUC__ || defined __llvm__
 #	define AZZATO_LIKELY(x) __builtin_expect(!!(x), 1)
@@ -14,7 +15,7 @@
 #define AZZATO_ASSERT(x)                                                                  \
 	if(AZZATO_UNLIKELY(!(x))) {                                                           \
 		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "ASSERTION: " #x << "\nbacktrace:\n"       \
-											<< azzato::BacktraceToString(100, 2, "    "); \
+											<< azzato::backtraceToString(100, 2, "    "); \
 		assert(x);                                                                        \
 	}
 
@@ -23,6 +24,6 @@
 	if(AZZATO_UNLIKELY(!(x))) {                                                           \
 		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "ASSERTION: " #x << "\n"                   \
 											<< w << "\nbacktrace:\n"                      \
-											<< azzato::BacktraceToString(100, 2, "    "); \
+											<< azzato::backtraceToString(100, 2, "    "); \
 		assert(x);                                                                        \
 	}
