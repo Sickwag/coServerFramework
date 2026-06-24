@@ -27,7 +27,7 @@
 			"inherits": "defaults",
 			"binaryDir": "${sourceDir}/out/build/debug",
 			"installDir": "${sourceDir}/out/install/debug",
-			"toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+			"toolchainFile": "/home/azzato/Programs/vcpkg/scripts/buildsystems/vcpkg.cmake",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug"
 			}
@@ -39,7 +39,7 @@
 			"inherits": "defaults",
 			"binaryDir": "${sourceDir}/out/build/release",
 			"installDir": "${sourceDir}/out/install/release",
-			"toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+			"toolchainFile": "/home/azzato/Programs/vcpkg/scripts/buildsystems/vcpkg.cmake",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release"
 			}

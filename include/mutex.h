@@ -21,68 +21,49 @@ class Semaphore : Noncopyable {
 };
 
 template <typename T>
-	requires requires(T t) {
-		t.lock();
-		t.unlock();
-	}
 struct ScopedLockImpl {
-  public:
 	ScopedLockImpl(T& mutex)
 		: _mutex(mutex) {
 		_mutex.lock();
-		_isLocked = true;
 	}
 	~ScopedLockImpl() { _mutex.unlock(); }
 	void lock() { _mutex.lock(); };
-	void unlock() {
-		_mutex.unlock();
-		_isLocked = false;
-	};
+	void unlock() { _mutex.unlock(); };
 
   private:
 	T&	 _mutex;
-	bool _isLocked;
 };
 
 template <typename T>
-	requires requires(T t) {
-		t.rdlock();
-		t.unlock();
-	}
 class ReadScopedLockImpl {
   public:
-	ReadScopedLockImpl(T& mutex) {
+	ReadScopedLockImpl(T& mutex)
+		: _mutex(mutex) {
 		_mutex.rdlock();
-		_isLocked = true;
 	}
-	~ReadScopedLockImpl(){_mutex.unlock()};
+	~ReadScopedLockImpl() { _mutex.unlock(); }
 
   private:
-	T&	 _mutex;
-	bool _isLocked;
+	T& _mutex;
 };
 
 template <typename T>
-	requires requires(T t) {
-		t.rdlock();
-		t.unlock();
-	}
 class WriteScopedLockImpl {
   public:
-	WriteScopedLockImpl(T& mutex) {
-		_mutex.rdlock();
-		_isLocked = true;
+	WriteScopedLockImpl(T& mutex)
+		: _mutex(mutex) {
+		_mutex.wrlock();
 	}
-	~WriteScopedLockImpl(){_mutex.unlock()};
+	~WriteScopedLockImpl() { _mutex.unlock(); }
 
   private:
-	T&	 _mutex;
-	bool _isLocked;
+	T& _mutex;
 };
 
 class Mutex : Noncopyable {
   public:
 	using Lock = ScopedLockImpl<Mutex>;
+
 	Mutex() { pthread_mutex_init(&_mutex, nullptr); }
 	~Mutex() { pthread_mutex_destroy(&_mutex); }
 	void lock() { pthread_mutex_lock(&_mutex); }
@@ -95,17 +76,18 @@ class Mutex : Noncopyable {
 /// @brief Null Lock, for debug
 class NullMutex : Noncopyable {
   public:
-	typedef ScopedLockImpl<NullMutex> Lock;
-	NullMutex() {}
-	~NullMutex() {}
+	using Lock = ScopedLockImpl<NullMutex>;
+
+	NullMutex() = default;
 	void lock() {}
 	void unlock() {}
 };
 
 class RWMutex : Noncopyable {
   public:
-	typedef ReadScopedLockImpl<RWMutex>	 ReadLock;
-	typedef WriteScopedLockImpl<RWMutex> WriteLock;
+	using ReadLock	= ReadScopedLockImpl<RWMutex>;
+	using WriteLock = WriteScopedLockImpl<RWMutex>;
+
 	RWMutex() { pthread_rwlock_init(&_lock, nullptr); }
 	~RWMutex() { pthread_rwlock_destroy(&_lock); }
 	void rdlock() { pthread_rwlock_rdlock(&_lock); }
@@ -118,10 +100,10 @@ class RWMutex : Noncopyable {
 
 class NullRWMutex : Noncopyable {
   public:
-	typedef ReadScopedLockImpl<NullMutex>  ReadLock;
-	typedef WriteScopedLockImpl<NullMutex> WriteLock;
-	NullRWMutex() {}
-	~NullRWMutex() {}
+	using ReadLock	= ReadScopedLockImpl<NullRWMutex>;
+	using WriteLock = WriteScopedLockImpl<NullRWMutex>;
+
+	NullRWMutex() = default;
 	void rdlock() {}
 	void wrlock() {}
 	void unlock() {}
@@ -129,7 +111,8 @@ class NullRWMutex : Noncopyable {
 
 class CASLock : Noncopyable {
   public:
-	typedef ScopedLockImpl<CASLock> Lock;
+	using Lock = ScopedLockImpl<CASLock>;
+
 	CASLock() { _mutex.clear(); }
 	~CASLock() {}
 	void lock() {
@@ -144,7 +127,8 @@ class CASLock : Noncopyable {
 
 class Spinlock : Noncopyable {
   public:
-	typedef ScopedLockImpl<Spinlock> Lock;
+	using Lock = ScopedLockImpl<Spinlock>;
+
 	Spinlock() { pthread_spin_init(&_mutex, 0); }
 	~Spinlock() { pthread_spin_destroy(&_mutex); }
 	void lock() { pthread_spin_lock(&_mutex); }
@@ -155,9 +139,10 @@ class Spinlock : Noncopyable {
 };
 
 class Scheduler;
+class Fiber;
 class FiberSemaphore : Noncopyable {
   public:
-	typedef Spinlock MutexType;
+	using MutexType = Spinlock;
 
 	FiberSemaphore(size_t initial_concurrency = 0);
 	~FiberSemaphore();
