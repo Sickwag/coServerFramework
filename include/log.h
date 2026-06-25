@@ -118,17 +118,17 @@ class LogLevel {
  * Order and separators are defined by LogFormatter::init(LogFormat).
  */
 enum class LogFormat : uint32_t {
-	None       = 0,
-	Message    = 1 << 0,
-	Level      = 1 << 1,
-	Elapse     = 1 << 2,
-	Name       = 1 << 3,
+	None	   = 0,
+	Message	   = 1 << 0,
+	Level	   = 1 << 1,
+	Elapse	   = 1 << 2,
+	Name	   = 1 << 3,
 	ThreadId   = 1 << 4,
-	FiberId    = 1 << 5,
+	FiberId	   = 1 << 5,
 	ThreadName = 1 << 6,
 	DateTime   = 1 << 7,
-	File       = 1 << 8,
-	Line       = 1 << 9,
+	File	   = 1 << 8,
+	Line	   = 1 << 9,
 };
 
 // -----------------------------------------------------------------------
@@ -241,29 +241,30 @@ class LogEventWrap {
 // LogFormatter
 // -----------------------------------------------------------------------
 
-/**
- * @brief Parses a pattern string and formats LogEvents into text.
- *
- * Pattern syntax (inspired by printf-style):
- *   %m  – message
- *   %p  – level
- *   %r  – elapsed ms
- *   %c  – logger name
- *   %t  – thread id
- *   %n  – newline
- *   %d  – datetime (optional {format} for strftime)
- *   %f  – filename
- *   %l  – line number
- *   %T  – tab
- *   %F  – fiber id
- *   %N  – thread name
- *
- * Default: "%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"
- */
 class LogFormatter {
   public:
 	using ptr = std::shared_ptr<LogFormatter>;
 
+	/**
+	 * @brief Parses a pattern string and formats LogEvents into text, a better method is use `init(LogFormat
+	 * fmt)` overload in bitmask
+	 *
+	 * Pattern syntax (inspired by printf-style):
+	 *   %m  – message
+	 *   %p  – level
+	 *   %r  – elapsed ms
+	 *   %c  – logger name
+	 *   %t  – thread id
+	 *   %n  – newline
+	 *   %d  – datetime (optional {format} for strftime)
+	 *   %f  – filename
+	 *   %l  – line number
+	 *   %T  – tab
+	 *   %F  – fiber id
+	 *   %N  – thread name
+	 *
+	 * Default: "%d{%Y-%m-%d %H:%M:%S}%T%t%T%N%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"
+	 */
 	explicit LogFormatter(const std::string& pattern);
 
 	/**
@@ -501,6 +502,8 @@ class LoggerManager {
 
 /// @brief Singleton alias for LoggerManager.
 using LoggerMgr = Singleton<LoggerManager>;
+
+static azzato::Logger::ptr systemLogger = AZZATO_LOG_NAME("system");
 
 }  // namespace azzato
 

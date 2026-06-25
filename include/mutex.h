@@ -6,6 +6,7 @@
 #include <semaphore.h>
 #include <thread>
 
+#include "fiber.h"
 #include "utils/noncopyable.h"
 
 namespace azzato {

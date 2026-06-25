@@ -1,5 +1,5 @@
-#include "macro.h"
 #include "mutex.h"
+#include "utils/macro.h"
 
 namespace azzato {
 Semaphore::Semaphore(uint32_t count) {
@@ -8,20 +8,18 @@ Semaphore::Semaphore(uint32_t count) {
 	}
 }
 
-Semaphore::~Semaphore() { sem_destroy(&_semaphore);
-}
+Semaphore::~Semaphore() { sem_destroy(&_semaphore); }
 
 void Semaphore::wait() {
-	if((sem_wait(&_semaphore))){
+	if((sem_wait(&_semaphore))) {
 		throw std::logic_error("sem_wait error");
-    }
+	}
 }
 
 void Semaphore::notify() {
-	if((sem_post(&_semaphore))){
+	if((sem_post(&_semaphore))) {
 		throw std::logic_error("sem_post error");
 	}
-
 }
 
 FiberSemaphore::FiberSemaphore(size_t initial_concurrency)
@@ -64,4 +62,4 @@ void FiberSemaphore::notify() {
 		++_concurrency;
 	}
 }
-} // namespace azzato
+}  // namespace azzato

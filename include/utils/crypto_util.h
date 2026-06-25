@@ -38,7 +38,7 @@ class CryptoUtil {
 
 class RSACipher {
   public:
-	typedef std::shared_ptr<RSACipher> ptr;
+	using ptr = std::shared_ptr<RSACipher>;
 
 	static int32_t
 	GenerateKey(const std::string& pubkey_file, const std::string& prikey_file, uint32_t length = 1024);

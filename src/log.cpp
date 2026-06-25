@@ -278,7 +278,6 @@ class TabFormatItem : public LogFormatter::FormatItem {
 
 // ---- Pattern parsing ----------------------------------------------------
 
-// %xxx  or  %xxx{fmt}  or  %%
 void LogFormatter::init() {
 	// Each tuple: (content, format, type)  type=0 raw string, type=1 format item
 	std::vector<std::tuple<std::string, std::string, int>> vec;
@@ -388,9 +387,7 @@ void LogFormatter::init() {
 }
 
 void LogFormatter::init(LogFormat fmt) {
-	auto add = [&](auto&& item) {
-		_items.push_back(std::move(item));
-	};
+	auto add = [&](auto&& item) { _items.push_back(std::move(item)); };
 
 	if((fmt & LogFormat::DateTime) != LogFormat::None) {
 		add(std::make_shared<DateTimeFormatItem>());
@@ -455,9 +452,8 @@ Logger::Logger(const std::string& name)
 	: _name(name)
 	, _level(LogLevel::Level::Debug) {
 	_formatter = std::make_shared<LogFormatter>(
-		LogFormat::DateTime | LogFormat::ThreadId | LogFormat::ThreadName
-		| LogFormat::FiberId | LogFormat::Level | LogFormat::Name
-		| LogFormat::File | LogFormat::Line | LogFormat::Message);
+		LogFormat::DateTime | LogFormat::ThreadId | LogFormat::ThreadName | LogFormat::FiberId
+		| LogFormat::Level | LogFormat::Name | LogFormat::File | LogFormat::Line | LogFormat::Message);
 }
 
 void Logger::setFormatter(LogFormatter::ptr val) {
