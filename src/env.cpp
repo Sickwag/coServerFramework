@@ -1,14 +1,50 @@
+#include "config.h"
 #include "env.h"
 #include "log.h"
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
-#include "config.h"
+
+namespace fs = std::filesystem;
 
 namespace azzato {
 
 static azzato::Logger::ptr gLogger = AZZATO_LOG_NAME("system");
 
-bool Env::init(int argc, char** argv) {}
+bool Env::init(int argc, char** argv) {
+	std::string link	  = "/proc/self/exe";
+	fs::path	fsExePath = fs::read_symlink(link);
+	_exe				  = fsExePath.string();
+	_cwd				  = fsExePath.parent_path().string() + "/";
+	_program			  = argv[0];
+	// -config /path/to/config -file xxxx -d
+	const char* nowKey	  = nullptr;
+	for(int i = 1; i < argc; ++i) {
+		if(argv[i][0] == '-') {
+			if(strlen(argv[i]) > 1) {
+				if(nowKey) {
+					add(nowKey, "");
+				}
+				nowKey = argv[i] + 1;
+			} else {
+				AZZATO_LOG_ERROR(systemLogger) << "invalid arg idx=" << i << " val=" << argv[i];
+				return false;
+			}
+		} else {
+			if(nowKey) {
+				add(nowKey, argv[i]);
+				nowKey = nullptr;
+			} else {
+				AZZATO_LOG_ERROR(systemLogger) << "invalid arg idx=" << i << " val=" << argv[i];
+				return false;
+			}
+		}
+	}
+	if(nowKey) {
+		add(nowKey, "");
+	}
+	return true;
+}
 
 void Env::add(const std::string& key, const std::string& val) {
 	RWMutexType::WriteLock lock(_mutex);
@@ -87,9 +123,8 @@ std::string Env::getAbsoluteWorkPath(const std::string& path) const {
 		return path;
 	}
 
-    ConfigVar<std::string>::ptr gServerWorkPath =
-        Config::lookup<std::string>("server.workPath");
-    return gServerWorkPath->getValue() + "/" + path;
+	ConfigVar<std::string>::ptr gServerWorkPath = Config::lookup<std::string>("server.workPath");
+	return gServerWorkPath->getValue() + "/" + path;
 }
 
 std::string Env::getConfigPath() { return getAbsolutePath(get("c", "conf")); }

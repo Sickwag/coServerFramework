@@ -296,8 +296,13 @@ class ConfigVar : public ConfigVarBase {
 	void	 clearListener();
 
   private:
-	RWMutexType							 _mutex;  // protect `_val` and `_callbacks`
-	T									 _val;
+	RWMutexType _mutex;	 // protect `_val` and `_callbacks`
+	T			_val;
+
+	/**
+	 * @brief all callbacks in it will be called when `_val` changes
+	 * @warning apply for `_mutex` in callback leads a dead lock
+	 */
 	std::map<uint64_t, onChangeCallback> _callbacks;
 };
 
@@ -333,7 +338,7 @@ class Config {
 	static void				  loadFromYaml(const YAML::Node& root);
 	static void				  loadFromConfigDir(const std::string& path, bool force = false);
 	static ConfigVarBase::ptr lookupBase(const std::string& name);
-	static void				  visit(std::function<void(ConfigVarBase::ptr)> cb);
+	static void				  visit(std::function<void(ConfigVarBase::ptr)> callback);
 
   private:
 	static ConfigVarMap& getDatas();
@@ -365,7 +370,7 @@ inline bool ConfigVar<T, FromStr, ToStr>::fromString(const std::string& val) {
 	} catch(std::exception& e) {
 		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
 			<< "ConfigVar::fromString exception " << e.what() << " convert: string to " << TypeToName<T>()
-			<< " name=" << m_name << " - " << val;
+			<< " name=" <<\s_.*\sval;
 	}
 	return false;
 }
@@ -387,6 +392,8 @@ inline void ConfigVar<T, FromStr, ToStr>::setValue(const T& v) {
 			i.second(_val, v);
 		}
 	}
+	RWMutexType::WriteLock lock(_mutex);
+	_val = v;
 }
 
 template <typename T, typename FromStr, typename ToStr>
@@ -436,13 +443,13 @@ Config::lookup(const std::string& name, const T& defaultValue, const std::string
 }
 
 template <typename T>
-inline typename ConfigVar<T>::ptr Config::lookup(std::string const &name) {
-    RWMutexType::ReadLock lock(getMutex());
-    auto const it = getDatas().find(name);
-	if(it == getDatas().end()){
-        return nullptr;
-    }
-    return std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
+inline typename ConfigVar<T>::ptr Config::lookup(const std::string& name) {
+	RWMutexType::ReadLock lock(getMutex());
+	const auto			  it = getDatas().find(name);
+	if(it == getDatas().end()) {
+		return nullptr;
+	}
+	return std::dynamic_pointer_cast<ConfigVar<T>>(it->second);
 }
 
 }  // namespace azzato

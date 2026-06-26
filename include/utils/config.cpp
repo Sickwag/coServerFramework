@@ -89,11 +89,11 @@ ConfigVarBase::ptr Config::lookupBase(const std::string& name) {
 	return it == getDatas().end() ? nullptr : it->second;
 }
 
-void Config::visit(std::function<void(ConfigVarBase::ptr)> cb) {
+void Config::visit(std::function<void(ConfigVarBase::ptr)> callback) {
 	RWMutexType::ReadLock lock(getMutex());
 	ConfigVarMap&		  m = getDatas();
 	for(auto it = m.begin(); it != m.end(); ++it) {
-		cb(it->second);
+		callback(it->second);
 	}
 }
 

@@ -26,7 +26,8 @@ in_addr_t getIPv4Inet() {
 
 	in_addr_t localhost	 = inet_addr("127.0.0.1");
 	if(getifaddrs(&ifas)) {
-		// TODO: SYLAR_LOG_ERROR(g_logger) << "getifaddrs errno=" << errno << " errstr=" << strerror(errno);
+		// TODO: AZZATO_LOG_ERROR(systemLogger) << "getifaddrs errno=" << errno << " errstr=" <<
+		// strerror(errno);
 		return localhost;
 	}
 

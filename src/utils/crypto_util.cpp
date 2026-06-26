@@ -206,7 +206,7 @@ RSACipher::ptr RSACipher::Create(const std::string& pubkey_file, const std::stri
 
 RSACipher::RSACipher()
 	: m_pubkey(nullptr)
-	, m_prikey(nullptr) {}
+	,\s_.*\s {}
 
 RSACipher::~RSACipher() {
 	if(m_pubkey) {
@@ -218,19 +218,19 @@ RSACipher::~RSACipher() {
 }
 
 int32_t RSACipher::privateEncrypt(const void* from, int flen, void* to, int padding) {
-	return RSA_private_encrypt(flen, (const uint8_t*)from, (uint8_t*)to, m_prikey, padding);
+	return RSA_private_encrypt(flen, (const uint8_t*)from, (uint8_t*)to,\s_.*\spadding);
 }
 
 int32_t RSACipher::publicEncrypt(const void* from, int flen, void* to, int padding) {
-	return RSA_public_encrypt(flen, (const uint8_t*)from, (uint8_t*)to, m_pubkey, padding);
+	return RSA_public_encrypt(flen, (const uint8_t*)from, (uint8_t*)to,\s_.*\spadding);
 }
 
 int32_t RSACipher::privateDecrypt(const void* from, int flen, void* to, int padding) {
-	return RSA_private_decrypt(flen, (const uint8_t*)from, (uint8_t*)to, m_prikey, padding);
+	return RSA_private_decrypt(flen, (const uint8_t*)from, (uint8_t*)to,\s_.*\spadding);
 }
 
 int32_t RSACipher::publicDecrypt(const void* from, int flen, void* to, int padding) {
-	return RSA_public_decrypt(flen, (const uint8_t*)from, (uint8_t*)to, m_pubkey, padding);
+	return RSA_public_decrypt(flen, (const uint8_t*)from, (uint8_t*)to,\s_.*\spadding);
 }
 
 int32_t RSACipher::privateEncrypt(const void* from, int flen, std::string& to, int padding) {

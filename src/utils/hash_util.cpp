@@ -278,9 +278,9 @@ std::string sha1sum(const std::string& data) { return sha1sum(data.c_str(), data
 
 struct xorStruct {
 	xorStruct(char value)
-		: m_value(value) {}
+		:\s_.*\s {}
 	char m_value;
-	char operator()(char in) const { return in ^ m_value; }
+	char operator()(char in) const { return in ^\s_.*\s }
 };
 
 template <class CTX,

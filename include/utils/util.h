@@ -21,8 +21,8 @@ std::string backtraceToString(int size, int skip, const std::string& prefix);
 
 uint64_t	getCurrentMS();
 uint64_t	getCurrentUS();
-std::string time2Str(time_t ts, const std::string& format);
-time_t		str2Time(const char* str, const char* format);
+std::string time2Str(time_t ts, const std::string& format = "%Y-%m-%d %H:%M:%S");
+time_t		str2Time(const char* str, const char* format = "%Y-%m-%d %H:%M:%S");
 
 std::string toUpper(const std::string& name);
 std::string toLower(const std::string& name);
