@@ -76,6 +76,7 @@ int __mkdir(const char* dirname) {
 	}
 	return mkdir(dirname, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
+
 ////////// Maintenance implementation
 
 ////////// for url encode/decode
@@ -103,10 +104,11 @@ constexpr char xdigitChars[256] = {
 };
 // clang-format on
 ////////// for url encode/decode
+
 void serializeUnknowFieldSet(const google::protobuf::UnknownFieldSet& ufs, Json::Value& jnode) {
 	std::map<int, std::vector<Json::Value>> kvs;
 	for(int i = 0; i < ufs.field_count(); i++) {
-		auto const& uf = ufs.field(i);
+		const auto& uf = ufs.field(i);
 		using UF	   = google::protobuf::UnknownField;
 		switch(uf.type()) {
 		case UF::TYPE_VARINT:
@@ -264,11 +266,11 @@ std::string getHostName() {
 }
 
 std::string getIPv4() {
-	static std::string const ip = _getIPv4();  // local IP will not change generally
+	static const std::string ip = _getIPv4();  // local IP will not change generally
 	return ip;
 }
 
-std::string demangle(char const* str) {
+std::string demangle(const char* str) {
 	size_t		size   = 0;
 	int			status = 0;
 	std::string rt;
@@ -308,7 +310,7 @@ std::string backtraceToString(int size, int skip, const std::string& prefix) {
 	backtrace(bt, size, skip);
 	std::stringstream ss;
 	std::for_each(
-		bt.begin(), bt.end(), [&ss, &prefix](std::string const& str) { ss << prefix << str << std::endl; });
+		bt.begin(), bt.end(), [&ss, &prefix](const std::string& str) { ss << prefix << str << std::endl; });
 	return ss.str();
 }
 
@@ -353,7 +355,7 @@ std::string toLower(const std::string& name) {
 	return rt;
 }
 
-bool yamlToJson(YAML::Node const& ynode, Json::Value& jnode) {
+bool yamlToJson(const YAML::Node& ynode, Json::Value& jnode) {
 	try {
 		if(ynode.IsScalar()) {
 			Json::Value v(ynode.Scalar());
@@ -385,7 +387,7 @@ bool yamlToJson(YAML::Node const& ynode, Json::Value& jnode) {
 	return true;
 }
 
-bool jsonToYaml(Json::Value const& jnode, YAML::Node& ynode) {
+bool jsonToYaml(const Json::Value& jnode, YAML::Node& ynode) {
 	try {
 		if(jnode.isArray()) {
 			for(int i = 0; i < (int)jnode.size(); ++i) {
@@ -414,13 +416,13 @@ bool jsonToYaml(Json::Value const& jnode, YAML::Node& ynode) {
 	return true;
 }
 
-std::string PBToJsonString(google::protobuf::Message const& message) {
+std::string PBToJsonString(const google::protobuf::Message& message) {
 	Json::Value jnode;
 	serializeMessage(message, jnode);
 	return JsonUtil::toString(jnode);
 }
 
-bool readFixFromStreamWithSpeed(std::ifstream& is, char* data, uint64_t const& size, uint64_t const& speed) {
+bool readFixFromStreamWithSpeed(std::ifstream& is, char* data, const uint64_t& size, const uint64_t& speed) {
 	SpeedLimit::ptr limit;
 	if(dynamic_cast<std::ifstream*>(&is)) {
 		limit.reset(new SpeedLimit(speed));
@@ -441,9 +443,9 @@ bool readFixFromStreamWithSpeed(std::ifstream& is, char* data, uint64_t const& s
 }
 
 bool writeFixToStreamWithSpeed(std::ofstream&  os,
-							   char const*	   data,
-							   uint64_t const& size,
-							   uint64_t const& speed) {
+							   const char*	   data,
+							   const uint64_t& size,
+							   const uint64_t& speed) {
 	SpeedLimit::ptr limit;
 	if(dynamic_cast<std::ofstream*>(&os)) {
 		limit.reset(new SpeedLimit(speed));
@@ -465,8 +467,8 @@ bool writeFixToStreamWithSpeed(std::ofstream&  os,
 }
 
 void FSUtil::listAllFile(std::vector<std::string>& files,
-						 std::string const&		   path,
-						 std::string const&		   subfix) {
+						 const std::string&		   path,
+						 const std::string&		   subfix) {
 
 	////////// Maintenance implementation
 	// if(access(path.c_str(), F_OK) != 0) {
@@ -521,7 +523,7 @@ void FSUtil::listAllFile(std::vector<std::string>& files,
 	}
 }
 
-bool FSUtil::mkdir(std::string const& dirname) {
+bool FSUtil::mkdir(const std::string& dirname) {
 	////////// Maintenance implementation
 	// if(__lstat(dirname.c_str()) == 0) {
 	// 	return true;
@@ -866,7 +868,7 @@ double TypeUtil::atof(const char* str) {
 
 #define CHAR_IS_UNRESERVED(c) (uriChars[(unsigned char)(c)])
 
-std::string StringUtil::urlEncode(std::string const& str, bool space_as_plus) {
+std::string StringUtil::urlEncode(const std::string& str, bool space_as_plus) {
 	static const char* hexdigits = "0123456789ABCDEF";
 	std::string*	   ss		 = nullptr;
 	const char*		   end		 = str.c_str() + str.length();
@@ -897,7 +899,7 @@ std::string StringUtil::urlEncode(std::string const& str, bool space_as_plus) {
 	}
 }
 
-std::string StringUtil::urlDecode(std::string const& str, bool space_as_plus) {
+std::string StringUtil::urlDecode(const std::string& str, bool space_as_plus) {
 	std::string* ss	 = nullptr;
 	const char*	 end = str.c_str() + str.length();
 	for(const char* c = str.c_str(); c < end; ++c) {
@@ -927,7 +929,7 @@ std::string StringUtil::urlDecode(std::string const& str, bool space_as_plus) {
 	}
 }
 
-std::string StringUtil::trim(std::string const& str, std::string const& delimit) {
+std::string StringUtil::trim(const std::string& str, const std::string& delimit) {
 	auto begin = str.find_first_not_of(delimit);
 	if(begin == std::string::npos) {
 		return "";
@@ -936,7 +938,7 @@ std::string StringUtil::trim(std::string const& str, std::string const& delimit)
 	return str.substr(begin, end - begin + 1);
 }
 
-std::string StringUtil::trimLeft(std::string const& str, std::string const& delimit) {
+std::string StringUtil::trimLeft(const std::string& str, const std::string& delimit) {
 	auto begin = str.find_first_not_of(delimit);
 	if(begin == std::string::npos) {
 		return "";
@@ -944,7 +946,7 @@ std::string StringUtil::trimLeft(std::string const& str, std::string const& deli
 	return str.substr(begin);
 }
 
-std::string StringUtil::trimRight(std::string const& str, std::string const& delimit) {
+std::string StringUtil::trimRight(const std::string& str, const std::string& delimit) {
 	auto end = str.find_last_not_of(delimit);
 	if(end == std::string::npos) {
 		return "";
@@ -952,7 +954,7 @@ std::string StringUtil::trimRight(std::string const& str, std::string const& del
 	return str.substr(0, end);
 }
 
-std::string StringUtil::wstringToString(std::wstring const& ws) {
+std::string StringUtil::wstringToString(const std::wstring& ws) {
 	std::string	   str_locale  = setlocale(LC_ALL, "");
 	const wchar_t* wch_src	   = ws.c_str();
 	size_t		   n_dest_size = wcstombs(NULL, wch_src, 0) + 1;
@@ -965,7 +967,7 @@ std::string StringUtil::wstringToString(std::wstring const& ws) {
 	return str_result;
 }
 
-std::wstring StringUtil::stringToWString(std::string const& s) {
+std::wstring StringUtil::stringToWString(const std::string& s) {
 	std::string str_locale	= setlocale(LC_ALL, "");
 	const char* chSrc		= s.c_str();
 	size_t		n_dest_size = mbstowcs(NULL, chSrc, 0) + 1;

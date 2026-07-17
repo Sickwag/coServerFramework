@@ -13,7 +13,14 @@ class Fiber : public std::enable_shared_from_this<Fiber> {
   public:
 	using ptr = std::shared_ptr<Fiber>;
 
-	enum class FiberState { Init, Holding, Execute, Terminate, Ready, Exception };
+	enum class FiberState {
+		Init,
+		Holding,
+		Execute,
+		Terminate,
+		Ready,
+		Exception
+	};
 
 	Fiber(std::function<void()> callback, size_t stacksize = 0, bool useCaller = false);
 	~Fiber();

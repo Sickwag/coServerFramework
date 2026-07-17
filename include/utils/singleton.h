@@ -17,6 +17,7 @@ std::shared_ptr<T> getInstancePtr() {
 	static std::shared_ptr<T> v(new T);
 	return v;
 }
+
 ////////// Maintenance implementation
 
 template <class T, class X = void, int N = 0>

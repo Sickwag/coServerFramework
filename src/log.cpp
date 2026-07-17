@@ -122,6 +122,7 @@ namespace {
 class MessageFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit MessageFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -133,6 +134,7 @@ class MessageFormatItem : public LogFormatter::FormatItem {
 class LevelFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit LevelFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level level,
@@ -144,6 +146,7 @@ class LevelFormatItem : public LogFormatter::FormatItem {
 class ElapseFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit ElapseFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -155,6 +158,7 @@ class ElapseFormatItem : public LogFormatter::FormatItem {
 class NameFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit NameFormatItem(const std::string& /*unused*/) {}
+
 	void
 	format(std::ostream& os, Logger::ptr logger, LogLevel::Level /*level*/, LogEvent::ptr event) override {
 		os << event->getLogger()->getName();
@@ -164,6 +168,7 @@ class NameFormatItem : public LogFormatter::FormatItem {
 class ThreadIdFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit ThreadIdFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -175,6 +180,7 @@ class ThreadIdFormatItem : public LogFormatter::FormatItem {
 class FiberIdFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit FiberIdFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -186,6 +192,7 @@ class FiberIdFormatItem : public LogFormatter::FormatItem {
 class ThreadNameFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit ThreadNameFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -218,6 +225,7 @@ class DateTimeFormatItem : public LogFormatter::FormatItem {
 class FilenameFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit FilenameFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -229,6 +237,7 @@ class FilenameFormatItem : public LogFormatter::FormatItem {
 class LineFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit LineFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -240,6 +249,7 @@ class LineFormatItem : public LogFormatter::FormatItem {
 class NewLineFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit NewLineFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -252,6 +262,7 @@ class StringFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit StringFormatItem(const std::string& str)
 		: _string(str) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -266,6 +277,7 @@ class StringFormatItem : public LogFormatter::FormatItem {
 class TabFormatItem : public LogFormatter::FormatItem {
   public:
 	explicit TabFormatItem(const std::string& /*unused*/) {}
+
 	void format(std::ostream& os,
 				Logger::ptr /*logger*/,
 				LogLevel::Level /*level*/,
@@ -538,9 +550,13 @@ void Logger::log(LogLevel::Level level, LogEvent::ptr event) {
 }
 
 void Logger::debug(LogEvent::ptr event) { log(LogLevel::Level::Debug, std::move(event)); }
+
 void Logger::info(LogEvent::ptr event) { log(LogLevel::Level::Info, std::move(event)); }
+
 void Logger::warn(LogEvent::ptr event) { log(LogLevel::Level::Warn, std::move(event)); }
+
 void Logger::error(LogEvent::ptr event) { log(LogLevel::Level::Error, std::move(event)); }
+
 void Logger::fatal(LogEvent::ptr event) { log(LogLevel::Level::Fatal, std::move(event)); }
 
 // ======================================================================

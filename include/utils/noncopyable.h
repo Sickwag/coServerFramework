@@ -5,7 +5,7 @@ class Noncopyable {
   public:
 	Noncopyable()									 = default;
 	~Noncopyable()									 = default;
-	Noncopyable(Noncopyable const& other)			 = delete;
-	Noncopyable& operator=(Noncopyable const& other) = delete;
+	Noncopyable(const Noncopyable& other)			 = delete;
+	Noncopyable& operator=(const Noncopyable& other) = delete;
 };
 }  // namespace azzato

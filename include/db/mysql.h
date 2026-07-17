@@ -12,13 +12,14 @@
 
 namespace azzato {
 
-// typedef std::shared_ptr<MYSQL_RES> MySQLResPtr;
-// typedef std::shared_ptr<MYSQL> MySQLPtr;
+// using MySQLResPtr = std::shared_ptr<MYSQL_RES>;
+// using MySQLPtr = std::shared_ptr<MYSQL>;
 class MySQL;
 class MySQLStmt;
+
 // class IMySQLUpdate {
 // public:
-//     typedef std::shared_ptr<IMySQLUpdate> ptr;
+//     using ptr = std::shared_ptr<IMySQLUpdate>;
 //     virtual ~IMySQLUpdate() {}
 //     virtual int cmd(const char* format, ...) = 0;
 //     virtual int cmd(const char* format, va_list ap) = 0;
@@ -29,6 +30,7 @@ class MySQLStmt;
 struct MySQLTime {
 	MySQLTime(time_t t)
 		: ts(t) {}
+
 	time_t ts;
 };
 
@@ -37,17 +39,18 @@ bool time_t_to_mysql_time(const time_t& ts, MYSQL_TIME& mt);
 
 class MySQLResultSet : public ISQLData {
   public:
-	typedef std::shared_ptr<MySQLResultSet>									ptr;
-	typedef std::function<bool(MYSQL_ROW row, int field_count, int row_no)> data_cb;
+	using ptr		   = std::shared_ptr<MySQLResultSet>;
+	using dataCallback = std::function<bool(MYSQL_ROW row, int field_count, int row_no)>;
 
 	MySQLResultSet(MYSQL_RES* res, int eno, const char* estr);
 
 	MYSQL_RES* get() const { return _data.get(); }
 
-	int				   getErrno() const { return _errno; }
+	int getErrno() const { return _errno; }
+
 	const std::string& getErrStr() const { return _errstr; }
 
-	bool foreach(data_cb cb);
+	bool foreach(dataCallback cb);
 
 	int			getDataCount() override;
 	int			getColumnCount() override;
@@ -83,11 +86,12 @@ class MySQLStmtResultSet : public ISQLData {
 	friend class MySQLStmt;
 
   public:
-	typedef std::shared_ptr<MySQLStmtResultSet> ptr;
-	static MySQLStmtResultSet::ptr			  create(std::shared_ptr<MySQLStmt> stmt);
+	using ptr = std::shared_ptr<MySQLStmtResultSet>;
+	static MySQLStmtResultSet::ptr create(std::shared_ptr<MySQLStmt> stmt);
 	~MySQLStmtResultSet();
 
-	int				   getErrno() const { return _errno; }
+	int getErrno() const { return _errno; }
+
 	const std::string& getErrStr() const { return _errstr; }
 
 	int			getDataCount() override;
@@ -114,18 +118,19 @@ class MySQLStmtResultSet : public ISQLData {
 
   private:
 	MySQLStmtResultSet(std::shared_ptr<MySQLStmt> stmt, int eno, const std::string& estr);
+
 	struct Data {
 		Data();
 		~Data();
 
 		void alloc(size_t size);
 
-		bool			 is_null;
-		bool			 error;
-		enum_field_types type;
-		unsigned long	 length;
-		int32_t			 data_length;
-		char*			 data;
+		bool			 _isNull;
+		bool			 _error;
+		enum_field_types _type;
+		unsigned long	 _length;
+		int32_t			 _dataLength;
+		char*			 _data;
 	};
 
   private:
@@ -137,19 +142,23 @@ class MySQLStmtResultSet : public ISQLData {
 };
 
 class MySQLManager;
+
 class MySQL : public IDB, public std::enable_shared_from_this<MySQL> {
 	friend class MySQLManager;
 
   public:
-	typedef std::shared_ptr<MySQL> ptr;
+	using ptr = std::shared_ptr<MySQL>;
 
 	MySQL(const std::map<std::string, std::string>& args);
 
 	bool connect();
 	bool ping();
 
-	virtual int			   execute(const char* format, ...) override;
-	int					   execute(const char* format, va_list ap);
+	template <typename... Args>
+	int execute(std::format_string<Args...> fmt, Args&&... args) {
+		return execute(std::vformat(fmt.get(), std::make_format_args(std::forward<Args>(args)...)));
+	}
+
 	virtual int			   execute(const std::string& sql) override;
 	int64_t				   getLastInsertId() override;
 	std::shared_ptr<MySQL> getMySQL();
@@ -157,11 +166,13 @@ class MySQL : public IDB, public std::enable_shared_from_this<MySQL> {
 
 	uint64_t getAffectedRows();
 
-	ISQLData::ptr query(const char* format, ...) override;
-	ISQLData::ptr query(const char* format, va_list ap);
-	ISQLData::ptr query(const std::string& sql) override;
+	template <typename... Args>
+	ISQLData::ptr query(std::format_string<Args...> fmt, Args&&... args) {
+		return query(std::vformat(fmt.get(), std::make_format_args(std::forward<Args>(args)...)));
+	}
 
-	ITransaction::ptr  openTransaction(bool auto_commit) override;
+	ISQLData::ptr	   query(const std::string& sql) override;
+	ITransaction::ptr  openTransaction(bool autoCommit) override;
 	azzato::IStmt::ptr prepare(const std::string& sql) override;
 
 	template <typename... Args>
@@ -194,9 +205,9 @@ class MySQL : public IDB, public std::enable_shared_from_this<MySQL> {
 
 class MySQLTransaction : public ITransaction {
   public:
-	typedef std::shared_ptr<MySQLTransaction> ptr;
+	using ptr = std::shared_ptr<MySQLTransaction>;
 
-	static MySQLTransaction::ptr create(MySQL::ptr mysql, bool auto_commit);
+	static MySQLTransaction::ptr create(MySQL::ptr mysql, bool autoCommit);
 	~MySQLTransaction();
 
 	bool begin() override;
@@ -210,14 +221,17 @@ class MySQLTransaction : public ITransaction {
 	int execute(std::format_string<Args...> fmt, Args&&... args) {
 		return execute(std::vformat(fmt.get(), std::make_format_args(std::forward<Args>(args)...)));
 	}
+
 	virtual int execute(const std::string& sql) override;
 
 	bool isAutoCommit() const { return _autoCommit; }
+
 	bool isFinished() const { return _isFinished; }
+
 	bool isError() const { return _hasError; }
 
   private:
-	MySQLTransaction(MySQL::ptr mysql, bool auto_commit);
+	MySQLTransaction(MySQL::ptr mysql, bool autoCommit);
 
   private:
 	MySQL::ptr _mysql;
@@ -228,8 +242,8 @@ class MySQLTransaction : public ITransaction {
 
 class MySQLStmt : public IStmt, public std::enable_shared_from_this<MySQLStmt> {
   public:
-	typedef std::shared_ptr<MySQLStmt> ptr;
-	static MySQLStmt::ptr			   create(MySQL::ptr db, const std::string& stmt);
+	using ptr = std::shared_ptr<MySQLStmt>;
+	static MySQLStmt::ptr create(MySQL::ptr db, const std::string& stmt);
 
 	~MySQLStmt();
 	int bind(int idx, const int8_t& value);
@@ -287,7 +301,7 @@ class MySQLStmt : public IStmt, public std::enable_shared_from_this<MySQLStmt> {
 
 class MySQLManager {
   public:
-	typedef azzato::Mutex MutexType;
+	using MutexType = azzato::Mutex;
 
 	MySQLManager();
 	~MySQLManager();
@@ -298,17 +312,23 @@ class MySQLManager {
 	void checkConnection(int sec = 30);
 
 	uint32_t getMaxConn() const { return _maxConn; }
-	void	 setMaxConn(uint32_t v) { _maxConn = v; }
 
-	int execute(const std::string& name, const char* format, ...);
-	int execute(const std::string& name, const char* format, va_list ap);
+	void setMaxConn(uint32_t v) { _maxConn = v; }
+
+	template <typename... Args>
+	int execute(const std::string& name, std::format_string<Args...> fmt, Args&&... args) {
+		return execute(name, std::vformat(fmt.get(), std::make_format_args(std::forward<Args>(args)...)));
+	}
+
 	int execute(const std::string& name, const std::string& sql);
 
-	ISQLData::ptr query(const std::string& name, const char* format, ...);
-	ISQLData::ptr query(const std::string& name, const char* format, va_list ap);
-	ISQLData::ptr query(const std::string& name, const std::string& sql);
+	template <typename... Args>
+	ISQLData::ptr query(const std::string& name, std::format_string<Args...> fmt, Args&&... args) {
+		return query(name, std::vformat(fmt.get(), std::make_format_args(std::forward<Args>(args)...)));
+	}
 
-	MySQLTransaction::ptr openTransaction(const std::string& name, bool auto_commit);
+	ISQLData::ptr		  query(const std::string& name, const std::string& sql);
+	MySQLTransaction::ptr openTransaction(const std::string& name, bool autoCommit);
 
   private:
 	void freeMySQL(const std::string& name, MySQL* m);
@@ -322,23 +342,51 @@ class MySQLManager {
 
 class MySQLUtil {
   public:
-	static ISQLData::ptr Query(const std::string& name, const char* format, ...);
-	static ISQLData::ptr Query(const std::string& name, const char* format, va_list ap);
-	static ISQLData::ptr Query(const std::string& name, const std::string& sql);
+	template <typename... Args>
+	static ISQLData::ptr query(const std::string& name, std::format_string<Args...> fmt, Args&&... args) {
+		return query(name, std::vformat(fmt.get(), std::make_format_args(std::forward<Args>(args)...)));
+	}
 
-	static ISQLData::ptr TryQuery(const std::string& name, uint32_t count, const char* format, ...);
-	static ISQLData::ptr TryQuery(const std::string& name, uint32_t count, const std::string& sql);
+	static ISQLData::ptr query(const std::string& name, const std::string& sql);
 
-	static int Execute(const std::string& name, const char* format, ...);
-	static int Execute(const std::string& name, const char* format, va_list ap);
-	static int Execute(const std::string& name, const std::string& sql);
+	template <typename... Args>
+	static ISQLData::ptr
+	tryQuery(const std::string& name, uint32_t count, std::format_string<Args...> fmt, Args&&... args) {
+		for(uint32_t i = 0; i < count; ++i) {
+			auto rpy = query(name, std::vformat(fmt.get(), std::make_format_args(args...)));
+			if(rpy) {
+				return rpy;
+			}
+		}
+		return nullptr;
+	}
 
-	static int TryExecute(const std::string& name, uint32_t count, const char* format, ...);
-	static int TryExecute(const std::string& name, uint32_t count, const char* format, va_list ap);
-	static int TryExecute(const std::string& name, uint32_t count, const std::string& sql);
+	static ISQLData::ptr tryQuery(const std::string& name, uint32_t count, const std::string& sql);
+
+	template <typename... Args>
+	static int execute(const std::string& name, std::format_string<Args...> fmt, Args&&... args) {
+		return execute(name, std::vformat(fmt.get(), std::make_format_args(std::forward<Args>(args)...)));
+	}
+
+	static int execute(const std::string& name, const std::string& sql);
+
+	template <typename... Args>
+	static int
+	tryExecute(const std::string& name, uint32_t count, std::format_string<Args...> fmt, Args&&... args) {
+		int rpy = 0;
+		for(uint32_t i = 0; i < count; ++i) {
+			rpy = execute(name, std::vformat(fmt.get(), std::make_format_args(args...)));
+			if(!rpy) {
+				return rpy;
+			}
+		}
+		return rpy;
+	}
+
+	static int tryExecute(const std::string& name, uint32_t count, const std::string& sql);
 };
 
-typedef azzato::Singleton<MySQLManager> MySQLMgr;
+using MySQLManger = azzato::Singleton<MySQLManager>;
 
 namespace {
 

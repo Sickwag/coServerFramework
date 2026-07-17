@@ -1,5 +1,6 @@
 #include "utils/json_util.h"
 #include "utils/util.h"
+
 namespace azzato {
 
 bool JsonUtil::needEscape(const std::string& v) {

@@ -123,6 +123,7 @@ uint32_t quick_hash(const void* tmp, uint32_t size) {
 uint64_t murmur3_hash64(const void* str, const uint32_t& size, const uint32_t& seed, const uint32_t& seed2) {
 	return (((uint64_t)murmur3_hash(str, size, seed)) << 32 | murmur3_hash(str, size, seed2));
 }
+
 uint64_t murmur3_hash64(const char* str, const uint32_t& seed, const uint32_t& seed2) {
 	return (((uint64_t)murmur3_hash(str, seed)) << 32 | murmur3_hash(str, seed2));
 }
@@ -279,7 +280,9 @@ std::string sha1sum(const std::string& data) { return sha1sum(data.c_str(), data
 struct xorStruct {
 	xorStruct(char value)
 		:\s_.*\s {}
+
 	char m_value;
+
 	char operator()(char in) const { return in ^\s_.*\s }
 };
 

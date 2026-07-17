@@ -7,7 +7,8 @@ namespace azzato {
 
 class ISQLData {
   public:
-	typedef std::shared_ptr<ISQLData> ptr;
+	using ptr = std::shared_ptr<ISQLData>;
+
 	virtual ~ISQLData() {}
 
 	virtual int				   getErrno() const	 = 0;
@@ -39,6 +40,7 @@ class ISQLData {
 class ISQLUpdate {
   public:
 	virtual ~ISQLUpdate() {}
+
 	virtual int		execute(const std::string& sql) = 0;
 	virtual int64_t getLastInsertId()				= 0;
 };
@@ -46,13 +48,16 @@ class ISQLUpdate {
 class ISQLQuery {
   public:
 	virtual ~ISQLQuery() {}
+
 	virtual ISQLData::ptr query(const std::string& sql) = 0;
 };
 
 class IStmt {
   public:
-	typedef std::shared_ptr<IStmt> ptr;
+	using ptr = std::shared_ptr<IStmt>;
+
 	virtual ~IStmt() {}
+
 	virtual int bindInt8(int idx, const int8_t& value)			   = 0;
 	virtual int bindUint8(int idx, const uint8_t& value)		   = 0;
 	virtual int bindInt16(int idx, const int16_t& value)		   = 0;
@@ -80,7 +85,7 @@ class IStmt {
 
 class ITransaction : public ISQLUpdate {
   public:
-	typedef std::shared_ptr<ITransaction> ptr;
+	using ptr = std::shared_ptr<ITransaction>;
 	virtual ~ITransaction(){};
 	virtual bool begin()	= 0;
 	virtual bool commit()	= 0;
@@ -89,7 +94,8 @@ class ITransaction : public ISQLUpdate {
 
 class IDB : public ISQLUpdate, public ISQLQuery {
   public:
-	typedef std::shared_ptr<IDB> ptr;
+	using ptr = std::shared_ptr<IDB>;
+
 	virtual ~IDB() {}
 
 	virtual IStmt::ptr		  prepare(const std::string& stmt)			= 0;

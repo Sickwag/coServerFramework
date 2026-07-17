@@ -1,7 +1,7 @@
 #pragma once
 
-#include <assert.h>
 #include "util.h"
+#include <assert.h>
 
 #if defined __GNUC__ || defined __llvm__
 #	define AZZATO_LIKELY(x) __builtin_expect(!!(x), 1)

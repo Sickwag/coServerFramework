@@ -23,6 +23,7 @@ class ConfigVarBase {
 	virtual ~ConfigVarBase() = default;
 
 	const std::string& getName() const { return _name; }
+
 	const std::string& getDescription() const { return _description; }
 
 	/**
@@ -289,6 +290,7 @@ class ConfigVar : public ConfigVarBase {
 	bool		fromString(const std::string& val) override;
 	const T		getValue() const;
 	void		setValue(const T& v);
+
 	std::string getTypeName() const override { return typeToName<T>(); }
 
 	uint64_t addListener(onChangeCallback callback);

@@ -131,9 +131,10 @@ concept ContiguousContainer = requires(T& t) {
 	{ t.data() } -> std::convertible_to<const std::remove_reference_t<decltype(t[0])>*>;
 	{ t.size() } -> std::convertible_to<std::size_t>;
 };
+
 //////// Concepts
 
-inline bool readFixFromStream(std::istream& is, char* data, uint64_t const& size) {
+inline bool readFixFromStream(std::istream& is, char* data, const uint64_t& size) {
 	uint64_t pos = 0;
 	while(is && (pos < size)) {
 		is.read(data + pos, size - pos);
@@ -195,13 +196,13 @@ bool writeToStreamWithSpeed(std::ostream&	os,
 
 bool readFixFromStreamWithSpeed(std::ifstream&	is,
 								char*			data,
-								uint64_t const& size,
-								uint64_t const& speed = -1);
+								const uint64_t& size,
+								const uint64_t& speed = -1);
 
 bool writeFixToStreamWithSpeed(std::ofstream&  os,
-							   char const*	   data,
-							   uint64_t const& size,
-							   uint64_t const& speed = -1);
+							   const char*	   data,
+							   const uint64_t& size,
+							   const uint64_t& speed = -1);
 
 template <typename T>
 bool readFromStreamWithSpeed(std::istream& is, const T& v, const uint64_t& speed = -1) {
@@ -290,7 +291,7 @@ class StringUtil {
 
 // should use "{}" instead of "%"
 template <typename... Args>
-inline std::string StringUtil::format(std::format_string<Args...> fmt, Args const&... args) {
+inline std::string StringUtil::format(std::format_string<Args...> fmt, const Args&... args) {
 	return std::format(fmt, args...);
 }
 
@@ -388,6 +389,7 @@ class SharedArray {
 	explicit SharedArray(const uint64_t& size = 0, T* p = 0)
 		: _size(size)
 		, _ptr(p, deleteArray<T>) {}
+
 	template <typename Deleter>
 	SharedArray(const uint64_t& size, T* p, Deleter d)
 		: _size(size)
@@ -402,16 +404,24 @@ class SharedArray {
 		_ptr  = r._ptr;
 		return *this;
 	}
-	T&	 operator[](std::ptrdiff_t i) const { return _ptr.get()[i]; }
-	T*	 get() const { return _ptr.get(); }
+
+	T& operator[](std::ptrdiff_t i) const { return _ptr.get()[i]; }
+
+	T* get() const { return _ptr.get(); }
+
 	bool unique() const { return _ptr.unique(); }
+
 	long useCount() const { return _ptr.use_count(); }
+
 	void swap(SharedArray& b) {
 		std::swap(_size, b._size);
 		_ptr.swap(b._ptr);
 	}
+
 	bool operator!() const { return !_ptr; }
+
 	operator bool() const { return !!_ptr; }
+
 	uint64_t size() const { return _size; }
 
   private:

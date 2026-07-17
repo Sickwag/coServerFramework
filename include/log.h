@@ -90,7 +90,14 @@ uint32_t getFiberId();
  */
 class LogLevel {
   public:
-	enum class Level : int { Unknow = 0, Debug, Info, Warn, Error, Fatal };
+	enum class Level : int {
+		Unknow = 0,
+		Debug,
+		Info,
+		Warn,
+		Error,
+		Fatal
+	};
 
 	/**
 	 * @brief Convert a Level to its uppercase string representation.
@@ -167,24 +174,34 @@ class LogEvent {
 
 	/** @return Source file name. */
 	const char* getFile() const { return _filename; }
+
 	/** @return Source line number. */
 	int32_t getLine() const { return _line; }
+
 	/** @return Elapsed milliseconds since program start. */
 	uint32_t getElapse() const { return _elapse; }
+
 	/** @return Thread ID. */
 	uint32_t getThreadId() const { return _threadId; }
+
 	/** @return Fiber / coroutine ID. */
 	uint32_t getFiberId() const { return _fiberId; }
+
 	/** @return Unix timestamp (seconds). */
 	uint64_t getTimestamp() const { return _timestamp; }
+
 	/** @return Thread name. */
 	const std::string& getThreadName() const { return _threadName; }
+
 	/** @return Accumulated log message content. */
 	std::string getContent() const { return _ss.str(); }
+
 	/** @return The logger that created this event. */
 	std::shared_ptr<Logger> getLogger() const { return _logger; }
+
 	/** @return Severity level. */
 	LogLevel::Level getLevel() const { return _level; }
+
 	/** @return The underlying stringstream for streaming-style logging. */
 	std::stringstream& getSS() { return _ss; }
 
@@ -230,7 +247,8 @@ class LogEventWrap {
 	explicit LogEventWrap(LogEvent::ptr e);
 	~LogEventWrap();
 
-	LogEvent::ptr	   getEvent() const { return _event; }
+	LogEvent::ptr getEvent() const { return _event; }
+
 	std::stringstream& getSS() const { return _event->getSS(); }
 
   private:
@@ -359,7 +377,8 @@ class LogAppender {
 	LogFormatter::ptr getFormatter();
 
 	LogLevel::Level getLevel() const { return _level; }
-	void			setLevel(LogLevel::Level val) { _level = val; }
+
+	void setLevel(LogLevel::Level val) { _level = val; }
 
   protected:
 	LogLevel::Level	  _level		= LogLevel::Level::Debug;
@@ -398,7 +417,8 @@ class Logger : public std::enable_shared_from_this<Logger> {
 	void clearAppenders();
 
 	LogLevel::Level getLevel() const { return _level; }
-	void			setLevel(LogLevel::Level val) { _level = val; }
+
+	void setLevel(LogLevel::Level val) { _level = val; }
 
 	const std::string& getName() const { return _name; }
 
@@ -501,7 +521,7 @@ class LoggerManager {
 };
 
 /// @brief Singleton alias for LoggerManager.
-using LoggerMgr = Singleton<LoggerManager>;
+using LoggerMgr							= Singleton<LoggerManager>;
 
 static azzato::Logger::ptr systemLogger = AZZATO_LOG_NAME("system");
 

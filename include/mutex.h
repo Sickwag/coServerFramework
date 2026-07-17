@@ -27,12 +27,15 @@ struct ScopedLockImpl {
 		: _mutex(mutex) {
 		_mutex.lock();
 	}
+
 	~ScopedLockImpl() { _mutex.unlock(); }
+
 	void lock() { _mutex.lock(); };
+
 	void unlock() { _mutex.unlock(); };
 
   private:
-	T&	 _mutex;
+	T& _mutex;
 };
 
 template <typename T>
@@ -42,6 +45,7 @@ class ReadScopedLockImpl {
 		: _mutex(mutex) {
 		_mutex.rdlock();
 	}
+
 	~ReadScopedLockImpl() { _mutex.unlock(); }
 
   private:
@@ -55,6 +59,7 @@ class WriteScopedLockImpl {
 		: _mutex(mutex) {
 		_mutex.wrlock();
 	}
+
 	~WriteScopedLockImpl() { _mutex.unlock(); }
 
   private:
@@ -66,8 +71,11 @@ class Mutex : Noncopyable {
 	using Lock = ScopedLockImpl<Mutex>;
 
 	Mutex() { pthread_mutex_init(&_mutex, nullptr); }
+
 	~Mutex() { pthread_mutex_destroy(&_mutex); }
+
 	void lock() { pthread_mutex_lock(&_mutex); }
+
 	void unlock() { pthread_mutex_unlock(&_mutex); }
 
   private:
@@ -77,10 +85,12 @@ class Mutex : Noncopyable {
 /// @brief Null Lock, for debug
 class NullMutex : Noncopyable {
   public:
-	using Lock = ScopedLockImpl<NullMutex>;
+	using Lock	= ScopedLockImpl<NullMutex>;
 
 	NullMutex() = default;
+
 	void lock() {}
+
 	void unlock() {}
 };
 
@@ -90,9 +100,13 @@ class RWMutex : Noncopyable {
 	using WriteLock = WriteScopedLockImpl<RWMutex>;
 
 	RWMutex() { pthread_rwlock_init(&_lock, nullptr); }
+
 	~RWMutex() { pthread_rwlock_destroy(&_lock); }
+
 	void rdlock() { pthread_rwlock_rdlock(&_lock); }
+
 	void wrlock() { pthread_rwlock_wrlock(&_lock); }
+
 	void unlock() { pthread_rwlock_unlock(&_lock); }
 
   private:
@@ -104,9 +118,12 @@ class NullRWMutex : Noncopyable {
 	using ReadLock	= ReadScopedLockImpl<NullRWMutex>;
 	using WriteLock = WriteScopedLockImpl<NullRWMutex>;
 
-	NullRWMutex() = default;
+	NullRWMutex()	= default;
+
 	void rdlock() {}
+
 	void wrlock() {}
+
 	void unlock() {}
 };
 
@@ -115,11 +132,14 @@ class CASLock : Noncopyable {
 	using Lock = ScopedLockImpl<CASLock>;
 
 	CASLock() { _mutex.clear(); }
+
 	~CASLock() {}
+
 	void lock() {
 		while(std::atomic_flag_test_and_set_explicit(&_mutex, std::memory_order_acquire))
 			;
 	}
+
 	void unlock() { std::atomic_flag_clear_explicit(&_mutex, std::memory_order_release); }
 
   private:
@@ -131,8 +151,11 @@ class Spinlock : Noncopyable {
 	using Lock = ScopedLockImpl<Spinlock>;
 
 	Spinlock() { pthread_spin_init(&_mutex, 0); }
+
 	~Spinlock() { pthread_spin_destroy(&_mutex); }
+
 	void lock() { pthread_spin_lock(&_mutex); }
+
 	void unlock() { pthread_spin_unlock(&_mutex); }
 
   private:
@@ -141,6 +164,7 @@ class Spinlock : Noncopyable {
 
 class Scheduler;
 class Fiber;
+
 class FiberSemaphore : Noncopyable {
   public:
 	using MutexType = Spinlock;
@@ -153,7 +177,8 @@ class FiberSemaphore : Noncopyable {
 	void notify();
 
 	size_t getConcurrency() const { return _concurrency; }
-	void   reset() { _concurrency = 0; }
+
+	void reset() { _concurrency = 0; }
 
   private:
 	MutexType									 _mutex;

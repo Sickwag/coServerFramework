@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/home/azzato/CodeFiles/learning/azzatoBackend/build/debug",
+  "command": "/usr/bin/c++  -I/home/azzato/CodeFiles/learning/azzatoBackend/include -g -O0 -g -std=gnu++20 -o CMakeFiles/azzatoBackend.dir/main.cpp.o -c /home/azzato/CodeFiles/learning/azzatoBackend/main.cpp",
+  "file": "/home/azzato/CodeFiles/learning/azzatoBackend/main.cpp",
+  "output": "CMakeFiles/azzatoBackend.dir/main.cpp.o"
+},
+{
+  "directory": "/home/azzato/CodeFiles/learning/azzatoBackend/build/debug",
+  "command": "/usr/bin/c++  -I/home/azzato/CodeFiles/learning/azzatoBackend/include -g -O0 -g -std=gnu++20 -o CMakeFiles/azzatoBackend.dir/src/log.cpp.o -c /home/azzato/CodeFiles/learning/azzatoBackend/src/log.cpp",
+  "file": "/home/azzato/CodeFiles/learning/azzatoBackend/src/log.cpp",
+  "output": "CMakeFiles/azzatoBackend.dir/src/log.cpp.o"
+},
+{
+  "directory": "/home/azzato/CodeFiles/learning/azzatoBackend/build/debug",
+  "command": "/usr/bin/c++  -I/home/azzato/CodeFiles/learning/azzatoBackend/include -g -O0 -g -std=gnu++20 -o CMakeFiles/azzatoBackend.dir/src/mutex.cpp.o -c /home/azzato/CodeFiles/learning/azzatoBackend/src/mutex.cpp",
+  "file": "/home/azzato/CodeFiles/learning/azzatoBackend/src/mutex.cpp",
+  "output": "CMakeFiles/azzatoBackend.dir/src/mutex.cpp.o"
+},
+{
+  "directory": "/home/azzato/CodeFiles/learning/azzatoBackend/build/debug",
+  "command": "/usr/bin/c++  -I/home/azzato/CodeFiles/learning/azzatoBackend/include -g -O0 -g -std=gnu++20 -o CMakeFiles/azzatoBackend.dir/src/utils/crypto_util.cpp.o -c /home/azzato/CodeFiles/learning/azzatoBackend/src/utils/crypto_util.cpp",
+  "file": "/home/azzato/CodeFiles/learning/azzatoBackend/src/utils/crypto_util.cpp",
+  "output": "CMakeFiles/azzatoBackend.dir/src/utils/crypto_util.cpp.o"
+},
+{
+  "directory": "/home/azzato/CodeFiles/learning/azzatoBackend/build/debug",
+  "command": "/usr/bin/c++  -I/home/azzato/CodeFiles/learning/azzatoBackend/include -g -O0 -g -std=gnu++20 -o CMakeFiles/azzatoBackend.dir/src/utils/hash_util.cpp.o -c /home/azzato/CodeFiles/learning/azzatoBackend/src/utils/hash_util.cpp",
+  "file": "/home/azzato/CodeFiles/learning/azzatoBackend/src/utils/hash_util.cpp",
+  "output": "CMakeFiles/azzatoBackend.dir/src/utils/hash_util.cpp.o"
+},
+{
+  "directory": "/home/azzato/CodeFiles/learning/azzatoBackend/build/debug",
+  "command": "/usr/bin/c++  -I/home/azzato/CodeFiles/learning/azzatoBackend/include -g -O0 -g -std=gnu++20 -o CMakeFiles/azzatoBackend.dir/src/utils/json_util.cpp.o -c /home/azzato/CodeFiles/learning/azzatoBackend/src/utils/json_util.cpp",
+  "file": "/home/azzato/CodeFiles/learning/azzatoBackend/src/utils/json_util.cpp",
+  "output": "CMakeFiles/azzatoBackend.dir/src/utils/json_util.cpp.o"
+},
+{
+  "directory": "/home/azzato/CodeFiles/learning/azzatoBackend/build/debug",
+  "command": "/usr/bin/c++  -I/home/azzato/CodeFiles/learning/azzatoBackend/include -g -O0 -g -std=gnu++20 -o CMakeFiles/azzatoBackend.dir/src/utils/util.cpp.o -c /home/azzato/CodeFiles/learning/azzatoBackend/src/utils/util.cpp",
+  "file": "/home/azzato/CodeFiles/learning/azzatoBackend/src/utils/util.cpp",
+  "output": "CMakeFiles/azzatoBackend.dir/src/utils/util.cpp.o"
+}
+]

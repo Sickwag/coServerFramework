@@ -42,6 +42,10 @@ logs/
 *.temp
 *.bak
 *.orig
+**/.cache/
+
+# LSP Files
+**/.clangd
 
 # 备份文件
 *~

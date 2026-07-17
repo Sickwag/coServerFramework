@@ -58,6 +58,7 @@ class RSACipher {
 	int32_t publicDecrypt(const void* from, int flen, std::string& to, int padding = RSA_NO_PADDING);
 
 	const std::string& getPubkeyStr() const { return\s_.*\s }
+
 	const std::string& getPrikeyStr() const {return\s_.*\s}
 
 	int32_t getPubRSASize();

@@ -10,7 +10,7 @@ namespace azzato {
 class Env {
   public:
 	using RWMutexType = RWMutex;
-	bool			init(int argc, char** argv);
+	bool init(int argc, char** argv);
 
 	void		add(const std::string& key, const std::string& val);
 	bool		has(const std::string& key);
@@ -22,6 +22,7 @@ class Env {
 	void printHelp();
 
 	const std::string& getExe() const { return _exe; }
+
 	const std::string& getCwd() const { return _cwd; }
 
 	bool		setEnv(const std::string& key, const std::string& val);
