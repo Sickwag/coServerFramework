@@ -1,36 +1,22 @@
 #pragma once
 
 #include <byteswap.h>
-#include <stdint.h>
-#include <type_traits>
+#include <cstdint>
 
 #define AZZATO_LITTLE_ENDIAN 1
 #define AZZATO_BIG_ENDIAN 2
 
 namespace azzato {
-// C++11 std::enable_if
-// template <class T>
-// typename std::enable_if<sizeof(T) == sizeof(uint64_t), T>::type byteswap(T value) {
-// 	return (T)bswap_64((uint64_t)(value));
-// }
-// template <class T>
-// typename std::enable_if<sizeof(T) == sizeof(uint32_t), T>::type byteswap(T value) {
-// 	return (T)bswap_64((uint32_t)(value));
-// }
-// template <class T>
-// typename std::enable_if<sizeof(T) == sizeof(uint16_t), T>::type byteswap(T value) {
-// 	return (T)bswap_64((uint16_t)(value));
-// }
 
-// C++17 if constexpr method
-template <class T>
+// Swap byte order for 64/32/16-bit values, selected at compile time via if constexpr.
+template <typename T>
 T byteswap(T value) {
 	if constexpr(sizeof(T) == sizeof(uint64_t)) {
-		return (T)bswap_64(value);
+		return static_cast<T>(bswap_64(static_cast<uint64_t>(value)));
 	} else if constexpr(sizeof(T) == sizeof(uint32_t)) {
-		return (T)bswap_32(value);
+		return static_cast<T>(bswap_32(static_cast<uint32_t>(value)));
 	} else if constexpr(sizeof(T) == sizeof(uint16_t)) {
-		return (T)bswap_16(value);
+		return static_cast<T>(bswap_16(static_cast<uint16_t>(value)));
 	}
 }
 
@@ -42,24 +28,24 @@ T byteswap(T value) {
 #endif
 
 #if AZZATO_BYTE_ORDER == AZZATO_BIG_ENDIAN
-template <class T>
+template <typename T>
 T byteswapOnLittleEndian(T t) {
 	return t;
 }
 
-template <class T>
+template <typename T>
 T byteswapOnBigEndian(T t) {
 	return byteswap(t);
 }
 
 #else
 
-template <class T>
+template <typename T>
 T byteswapOnLittleEndian(T t) {
 	return byteswap(t);
 }
 
-template <class T>
+template <typename T>
 T byteswapOnBigEndian(T t) {
 	return t;
 }

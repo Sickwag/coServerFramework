@@ -1,3 +1,4 @@
+#include "utils/hash_util.h"
 #include <algorithm>
 #include <cstdlib>
 #include <openssl/md5.h>
@@ -277,13 +278,13 @@ std::string sha1sum(const void* data, size_t len) {
 
 std::string sha1sum(const std::string& data) { return sha1sum(data.c_str(), data.size()); }
 
-struct xorStruct {
-	xorStruct(char value)
-		:\s_.*\s {}
+struct XorStruct {
+	explicit XorStruct(char value)
+		: _value(value) {}
 
-	char m_value;
+	char _value;
 
-	char operator()(char in) const { return in ^\s_.*\s }
+	char operator()(char in) const { return static_cast<char>(in ^ _value); }
 };
 
 template <class CTX,
@@ -303,8 +304,8 @@ std::string hmac(const std::string& text, const std::string& key) {
 	}
 	keyLocal.append(B - keyLocal.size(), '\0');
 	std::string ipad = keyLocal, opad = keyLocal;
-	std::transform(ipad.begin(), ipad.end(), ipad.begin(), xorStruct(0x36));
-	std::transform(opad.begin(), opad.end(), opad.begin(), xorStruct(0x5c));
+	std::transform(ipad.begin(), ipad.end(), ipad.begin(), XorStruct(0x36));
+	std::transform(opad.begin(), opad.end(), opad.begin(), XorStruct(0x5c));
 	Init(&ctx);
 	Update(&ctx, ipad.c_str(), B);
 	Update(&ctx, text.c_str(), text.size());

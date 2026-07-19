@@ -1,5 +1,6 @@
 #pragma once
 
+#include "log.h"
 #include "util.h"
 #include <assert.h>
 

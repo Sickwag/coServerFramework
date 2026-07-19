@@ -4,6 +4,7 @@
 #include "mutex.h"
 #include "utils/singleton.h"
 #include <adapters/libevent.h>
+#include <event2/event.h>
 #include <format>
 #include <hircluster.h>
 #include <hiredis.h>

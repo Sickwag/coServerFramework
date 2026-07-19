@@ -1,4 +1,5 @@
 #include "mutex.h"
+#include "scheduler.h"
 #include "utils/macro.h"
 
 namespace azzato {
@@ -28,7 +29,7 @@ FiberSemaphore::FiberSemaphore(size_t initial_concurrency)
 FiberSemaphore::~FiberSemaphore() { AZZATO_ASSERT(_waiters.empty()); }
 
 bool FiberSemaphore::tryWait() {
-	AZZATO_ASSERT(Scheduler::GetThis());
+	AZZATO_ASSERT(Scheduler::getThis());
 	{
 		MutexType::Lock lock(_mutex);
 		if(_concurrency > 0u) {
@@ -40,16 +41,16 @@ bool FiberSemaphore::tryWait() {
 }
 
 void FiberSemaphore::wait() {
-	AZZATO_ASSERT(Scheduler::GetThis());
+	AZZATO_ASSERT(Scheduler::getThis());
 	{
 		MutexType::Lock lock(_mutex);
 		if(_concurrency > 0u) {
 			--_concurrency;
 			return;
 		}
-		_waiters.push_back(std::make_pair(Scheduler::GetThis(), Fiber::GetThis()));
+		_waiters.push_back(std::make_pair(Scheduler::getThis(), Fiber::getThis()));
 	}
-	Fiber::YieldToHold();
+	Fiber::yieldToHold();
 }
 
 void FiberSemaphore::notify() {

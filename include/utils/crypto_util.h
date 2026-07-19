@@ -57,18 +57,18 @@ class RSACipher {
 	int32_t privateDecrypt(const void* from, int flen, std::string& to, int padding = RSA_NO_PADDING);
 	int32_t publicDecrypt(const void* from, int flen, std::string& to, int padding = RSA_NO_PADDING);
 
-	const std::string& getPubkeyStr() const { return\s_.*\s }
+	const std::string& getPubkeyStr() const { return _pubkeyStr; }
 
-	const std::string& getPrikeyStr() const {return\s_.*\s}
+	const std::string& getPrikeyStr() const { return _prikeyStr; }
 
 	int32_t getPubRSASize();
 	int32_t getPriRSASize();
 
   private:
-	RSA*		m_pubkey;
-	RSA*		m_prikey;
-	std::string m_pubkeyStr;
-	std::string m_prikeyStr;
+	RSA*		_pubkey;
+	RSA*		_prikey;
+	std::string _pubkeyStr;
+	std::string _prikeyStr;
 };
 
 }  // namespace azzato

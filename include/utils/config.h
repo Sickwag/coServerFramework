@@ -9,12 +9,14 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <typeinfo>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace azzato {
+
 class ConfigVarBase {
   public:
 	using ptr = std::shared_ptr<ConfigVarBase>;
@@ -54,7 +56,7 @@ class LexicalCast {
 	 * @return 返回v转换后的目标类型
 	 * @exception 当类型不可转换时从boost库内抛出异常
 	 */
-	T operator()(const Source& s) { return boost::lexical_cast<Target>(s); }
+	Target operator()(const Source& s) { return boost::lexical_cast<Target>(s); }
 };
 
 /**
@@ -298,7 +300,7 @@ class ConfigVar : public ConfigVarBase {
 	void	 clearListener();
 
   private:
-	RWMutexType _mutex;	 // protect `_val` and `_callbacks`
+	mutable RWMutexType _mutex;	 // protect `_val` and `_callbacks`
 	T			_val;
 
 	/**
@@ -356,11 +358,11 @@ inline std::string ConfigVar<T, FromStr, ToStr>::toString() {
 	try {
 		// return boost::lexical_cast<std::string>(m_val);
 		RWMutexType::ReadLock lock(_mutex);
-		return ToStr()(m_val);
+		return ToStr()(_val);
 	} catch(std::exception& e) {
 		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
-			<< "ConfigVar::toString exception " << e.what() << " convert: " << TypeToName<T>() << " to string"
-			<< " name=" << _name;
+			<< "ConfigVar::toString exception " << e.what() << " convert: " << typeToName<T>() << " to string"
+			<< " name=" << getName();
 	}
 	return "";
 }
@@ -371,8 +373,8 @@ inline bool ConfigVar<T, FromStr, ToStr>::fromString(const std::string& val) {
 		setValue(FromStr()(val));
 	} catch(std::exception& e) {
 		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
-			<< "ConfigVar::fromString exception " << e.what() << " convert: string to " << TypeToName<T>()
-			<< " name=" <<\s_.*\sval;
+			<< "ConfigVar::fromString exception " << e.what() << " convert: string to " << typeToName<T>()
+			<< " name=" << getName() << " value=" << val;
 	}
 	return false;
 }

@@ -1,5 +1,5 @@
 #include "db/mysql.h"
-#include "config.h"
+#include "utils/config.h"
 #include "log.h"
 #include <string>
 

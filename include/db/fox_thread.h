@@ -2,6 +2,7 @@
 #include "mutex.h"
 #include "utils/singleton.h"
 #include <event2/buffer.h>
+#include <event2/event.h>
 #include <map>
 
 namespace azzato {

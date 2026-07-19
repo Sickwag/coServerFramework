@@ -174,6 +174,16 @@ bool writeToStream(std::ostream& os, const T& v) {
 	return (bool)os;
 }
 
+bool readFixFromStreamWithSpeed(std::istream&  is,
+								char*			data,
+								const uint64_t& size,
+								const uint64_t& speed = -1);
+
+bool writeFixToStreamWithSpeed(std::ostream&   os,
+							   const char*	   data,
+							   const uint64_t& size,
+							   const uint64_t& speed = -1);
+
 template <typename T>
 bool writeToStreamWithSpeed(std::ostream& os, const T& v, const uint64_t& speed = -1) {
 	if(os) {
@@ -193,16 +203,6 @@ bool writeToStreamWithSpeed(std::ostream&	os,
 	}
 	return false;
 }
-
-bool readFixFromStreamWithSpeed(std::ifstream&	is,
-								char*			data,
-								const uint64_t& size,
-								const uint64_t& speed = -1);
-
-bool writeFixToStreamWithSpeed(std::ofstream&  os,
-							   const char*	   data,
-							   const uint64_t& size,
-							   const uint64_t& speed = -1);
 
 template <typename T>
 bool readFromStreamWithSpeed(std::istream& is, const T& v, const uint64_t& speed = -1) {

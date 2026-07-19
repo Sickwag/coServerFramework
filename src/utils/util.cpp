@@ -422,7 +422,7 @@ std::string PBToJsonString(const google::protobuf::Message& message) {
 	return JsonUtil::toString(jnode);
 }
 
-bool readFixFromStreamWithSpeed(std::ifstream& is, char* data, const uint64_t& size, const uint64_t& speed) {
+bool readFixFromStreamWithSpeed(std::istream& is, char* data, const uint64_t& size, const uint64_t& speed) {
 	SpeedLimit::ptr limit;
 	if(dynamic_cast<std::ifstream*>(&is)) {
 		limit.reset(new SpeedLimit(speed));
@@ -442,7 +442,7 @@ bool readFixFromStreamWithSpeed(std::ifstream& is, char* data, const uint64_t& s
 	return offset == size;
 }
 
-bool writeFixToStreamWithSpeed(std::ofstream&  os,
+bool writeFixToStreamWithSpeed(std::ostream&  os,
 							   const char*	   data,
 							   const uint64_t& size,
 							   const uint64_t& speed) {

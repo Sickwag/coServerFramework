@@ -386,7 +386,7 @@ class MySQLUtil {
 	static int tryExecute(const std::string& name, uint32_t count, const std::string& sql);
 };
 
-using MySQLManger = azzato::Singleton<MySQLManager>;
+using MySQLMgr = azzato::Singleton<MySQLManager>;
 
 namespace {
 

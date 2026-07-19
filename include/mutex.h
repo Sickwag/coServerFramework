@@ -48,6 +48,10 @@ class ReadScopedLockImpl {
 
 	~ReadScopedLockImpl() { _mutex.unlock(); }
 
+	void lock() { _mutex.rdlock(); }
+
+	void unlock() { _mutex.unlock(); }
+
   private:
 	T& _mutex;
 };
@@ -61,6 +65,10 @@ class WriteScopedLockImpl {
 	}
 
 	~WriteScopedLockImpl() { _mutex.unlock(); }
+
+	void lock() { _mutex.wrlock(); }
+
+	void unlock() { _mutex.unlock(); }
 
   private:
 	T& _mutex;

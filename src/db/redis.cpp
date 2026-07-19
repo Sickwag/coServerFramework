@@ -1,9 +1,9 @@
 #include "db/redis.h"
-#include "config.h"
-#include "hash_util.h"
+#include "scheduler.h"
+#include "utils/config.h"
+#include "utils/hash_util.h"
 #include "log.h"
-#include "macro.h"
-#include "sylar.h"
+#include "utils/macro.h"
 
 namespace azzato {
 
@@ -439,7 +439,7 @@ void FoxRedis::CmdCb(redisAsyncContext* ac, void* r, void* privdata) {
 		//                 << (ctx->rds->_cmdTimeout.tv_sec * 1000
 		//                         + ctx->rds->_cmdTimeout.tv_usec / 1000)
 		//                 << "ms)";
-		//     ctx->scheduler->schedule(&ctx->fiber);
+		//     ctx->scheduler->schedule(ctx->fiber);
 		//     ctx->cancelEvent();
 		// }
 		return;
@@ -455,7 +455,7 @@ void FoxRedis::CmdCb(redisAsyncContext* ac, void* r, void* privdata) {
 				<< "redis cmd: '" << ctx->cmd << "' " << "(" << ac->err << ") " << ac->errstr;
 		}
 		if(ctx->fctx->fiber) {
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	} else if(!reply) {
 		if(_logEnable) {
@@ -463,7 +463,7 @@ void FoxRedis::CmdCb(redisAsyncContext* ac, void* r, void* privdata) {
 			AZZATO_LOG_ERROR(systemLogger) << "redis cmd: '" << ctx->cmd << "' " << "reply: NULL";
 		}
 		if(ctx->fctx->fiber) {
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	} else if(reply->type == REDIS_REPLY_ERROR) {
 		if(_logEnable) {
@@ -471,12 +471,12 @@ void FoxRedis::CmdCb(redisAsyncContext* ac, void* r, void* privdata) {
 			AZZATO_LOG_ERROR(systemLogger) << "redis cmd: '" << ctx->cmd << "' " << "reply: " << reply->str;
 		}
 		if(ctx->fctx->fiber) {
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	} else {
 		if(ctx->fctx->fiber) {
 			ctx->fctx->rpy.reset(RedisReplyClone(reply), freeReplyObject);
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	}
 	ctx->cancelEvent();
@@ -559,11 +559,11 @@ bool FoxRedis::pinit() {
 ReplyPtr FoxRedis::cmd(const std::string& command) {
 	FCtx fctx;
 	fctx.cmd	   = command;
-	fctx.scheduler = Scheduler::GetThis();
-	fctx.fiber	   = Fiber::GetThis();
+	fctx.scheduler = Scheduler::getThis();
+	fctx.fiber	   = Fiber::getThis();
 
 	_thread->dispatch(std::bind(&FoxRedis::pcmd, this, &fctx));
-	Fiber::YieldToHold();
+	Fiber::yieldToHold();
 	return fctx.rpy;
 }
 
@@ -588,15 +588,15 @@ ReplyPtr FoxRedis::cmd(const std::vector<std::string>& argv) {
 		free(buf);
 	} while(0);
 
-	// ctx->scheduler = Scheduler::GetThis();
-	// ctx->fiber = Fiber::GetThis();
+	// ctx->scheduler = Scheduler::getThis();
+	// ctx->fiber = Fiber::getThis();
 	// ctx->thread = _thread;
 
-	fctx.scheduler = Scheduler::GetThis();
-	fctx.fiber	   = Fiber::GetThis();
+	fctx.scheduler = Scheduler::getThis();
+	fctx.fiber	   = Fiber::getThis();
 
 	_thread->dispatch(std::bind(&FoxRedis::pcmd, this, &fctx));
-	Fiber::YieldToHold();
+	Fiber::yieldToHold();
 	return fctx.rpy;
 }
 
@@ -605,7 +605,7 @@ void FoxRedis::pcmd(FCtx* fctx) {
 		AZZATO_LOG_INFO(systemLogger) << "redis (" << _host << ":" << _port << ") unconnected " << fctx->cmd;
 		init();
 		if(fctx->fiber) {
-			fctx->scheduler->schedule(&fctx->fiber);
+			fctx->scheduler->schedule(fctx->fiber);
 		}
 		return;
 	}
@@ -693,7 +693,7 @@ void FoxRedis::Ctx::EventCb(int fd, short event, void* d) {
 			<< (ctx->rds->_cmdTimeout.tv_sec * 1000 + ctx->rds->_cmdTimeout.tv_usec / 1000) << "ms";
 	}
 	if(ctx->fctx->fiber) {
-		ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+		ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 	}
 	ctx->cancelEvent();
 	// ctx->ref = nullptr;
@@ -777,7 +777,7 @@ void FoxRedisCluster::CmdCb(redisClusterAsyncContext* ac, void* r, void* privdat
 		//                 << (ctx->rds->_cmdTimeout.tv_sec * 1000
 		//                         + ctx->rds->_cmdTimeout.tv_usec / 1000)
 		//                 << "ms)";
-		//     ctx->scheduler->schedule(&ctx->fiber);
+		//     ctx->scheduler->schedule(ctx->fiber);
 		//     ctx->cancelEvent();
 		// }
 		return;
@@ -793,7 +793,7 @@ void FoxRedisCluster::CmdCb(redisClusterAsyncContext* ac, void* r, void* privdat
 				<< "redis cmd: '" << ctx->cmd << "' " << "(" << ac->err << ") " << ac->errstr;
 		}
 		if(ctx->fctx->fiber) {
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	} else if(!reply) {
 		if(_logEnable) {
@@ -801,7 +801,7 @@ void FoxRedisCluster::CmdCb(redisClusterAsyncContext* ac, void* r, void* privdat
 			AZZATO_LOG_ERROR(systemLogger) << "redis cmd: '" << ctx->cmd << "' " << "reply: NULL";
 		}
 		if(ctx->fctx->fiber) {
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	} else if(reply->type == REDIS_REPLY_ERROR) {
 		if(_logEnable) {
@@ -809,12 +809,12 @@ void FoxRedisCluster::CmdCb(redisClusterAsyncContext* ac, void* r, void* privdat
 			AZZATO_LOG_ERROR(systemLogger) << "redis cmd: '" << ctx->cmd << "' " << "reply: " << reply->str;
 		}
 		if(ctx->fctx->fiber) {
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	} else {
 		if(ctx->fctx->fiber) {
 			ctx->fctx->rpy.reset(RedisReplyClone(reply), freeReplyObject);
-			ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+			ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 		}
 	}
 	// ctx->ref = nullptr;
@@ -885,11 +885,11 @@ bool FoxRedisCluster::pinit() {
 ReplyPtr FoxRedisCluster::cmd(const std::string& command) {
 	FCtx fctx;
 	fctx.cmd	   = command;
-	fctx.scheduler = Scheduler::GetThis();
-	fctx.fiber	   = Fiber::GetThis();
+	fctx.scheduler = Scheduler::getThis();
+	fctx.fiber	   = Fiber::getThis();
 
 	_thread->dispatch(std::bind(&FoxRedisCluster::pcmd, this, &fctx));
-	Fiber::YieldToHold();
+	Fiber::yieldToHold();
 	return fctx.rpy;
 }
 
@@ -914,11 +914,11 @@ ReplyPtr FoxRedisCluster::cmd(const std::vector<std::string>& argv) {
 		free(buf);
 	} while(0);
 
-	fctx.scheduler = Scheduler::GetThis();
-	fctx.fiber	   = Fiber::GetThis();
+	fctx.scheduler = Scheduler::getThis();
+	fctx.fiber	   = Fiber::getThis();
 
 	_thread->dispatch(std::bind(&FoxRedisCluster::pcmd, this, &fctx));
-	Fiber::YieldToHold();
+	Fiber::yieldToHold();
 	return fctx.rpy;
 }
 
@@ -927,7 +927,7 @@ void FoxRedisCluster::pcmd(FCtx* fctx) {
 		AZZATO_LOG_INFO(systemLogger) << "redis (" << _host << ") unconnected " << fctx->cmd;
 		init();
 		if(fctx->fiber) {
-			fctx->scheduler->schedule(&fctx->fiber);
+			fctx->scheduler->schedule(fctx->fiber);
 		}
 		return;
 	}
@@ -1006,7 +1006,7 @@ void FoxRedisCluster::Ctx::cancelEvent() {
 	////if(Atomic::addFetch(cancel_count) > 1) {
 	////    return;
 	////}
-	////AZZATO_ASSERT(!Fiber::GetThis());
+	////AZZATO_ASSERT(!Fiber::getThis());
 	////RWMutex::WriteLock lock(mutex);
 	// if(++cancel_count > 1) {
 	//     return;
@@ -1051,7 +1051,7 @@ void FoxRedisCluster::Ctx::EventCb(int fd, short event, void* d) {
 	}
 	ctx->cancelEvent();
 	if(ctx->fctx->fiber) {
-		ctx->fctx->scheduler->schedule(&ctx->fctx->fiber);
+		ctx->fctx->scheduler->schedule(ctx->fctx->fiber);
 	}
 	// ctx->ref = nullptr;
 	// delete ctx;
@@ -1122,7 +1122,7 @@ void RedisManager::init() {
 			} else if(type == "fox_redis") {
 				auto conf = i.second;
 				auto name = i.first;
-				FoxThreadMgr::GetInstance()->dispatch("redis", [this, conf, name, &done]() {
+				FoxThreadMgr::getInstance()->dispatch("redis", [this, conf, name, &done]() {
 					FoxRedis* rds(new FoxRedis(FoxThread::GetThis(), conf));
 					rds->init();
 					rds->setName(name);
@@ -1134,7 +1134,7 @@ void RedisManager::init() {
 			} else if(type == "fox_redis_cluster") {
 				auto conf = i.second;
 				auto name = i.first;
-				FoxThreadMgr::GetInstance()->dispatch("redis", [this, conf, name, &done]() {
+				FoxThreadMgr::getInstance()->dispatch("redis", [this, conf, name, &done]() {
 					FoxRedisCluster* rds(new FoxRedisCluster(FoxThread::GetThis(), conf));
 					rds->init();
 					rds->setName(name);
