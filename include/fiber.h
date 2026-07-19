@@ -43,6 +43,10 @@ class Fiber : public std::enable_shared_from_this<Fiber>, private Noncopyable {
 
 	void back();
 
+	void swapIn();
+
+	void swapOut();
+
 	FiberState getState() const { return _state; }
 
 	uint64_t getFiberId() const { return _fiberId; }
@@ -64,10 +68,6 @@ class Fiber : public std::enable_shared_from_this<Fiber>, private Noncopyable {
   private:
 	// Only used to create the thread's main fiber.
 	Fiber();
-
-	void swapIn();
-
-	void swapOut();
 
 	static void mainFunc();
 

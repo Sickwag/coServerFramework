@@ -1,4 +1,5 @@
 #include "scheduler.h"
+#include "hook.h"
 #include "utils/macro.h"
 
 namespace azzato {
@@ -146,6 +147,7 @@ void Scheduler::idle() {
 
 void Scheduler::run() {
 	AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << _name << " run";
+	setHookEnable(true);
 	setThis(this);
 	if(Thread::getCurrentThreadId() != static_cast<uint64_t>(_rootThread)) {
 		t_scheduler_fiber = Fiber::getThis();

@@ -442,7 +442,7 @@ Config::lookup(const std::string& name, const T& defaultValue, const std::string
 	}
 
 	typename ConfigVar<T>::ptr v(new ConfigVar<T>(name, defaultValue, description));
-	getDatas().at(name) = v;
+	getDatas()[name] = v;
 	return v;
 }
 

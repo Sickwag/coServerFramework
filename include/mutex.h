@@ -26,16 +26,28 @@ struct ScopedLockImpl {
 	ScopedLockImpl(T& mutex)
 		: _mutex(mutex) {
 		_mutex.lock();
+		_locked = true;
 	}
 
-	~ScopedLockImpl() { _mutex.unlock(); }
+	~ScopedLockImpl() { unlock(); }
 
-	void lock() { _mutex.lock(); };
+	void lock() {
+		if(!_locked) {
+			_mutex.lock();
+			_locked = true;
+		}
+	}
 
-	void unlock() { _mutex.unlock(); };
+	void unlock() {
+		if(_locked) {
+			_mutex.unlock();
+			_locked = false;
+		}
+	}
 
   private:
-	T& _mutex;
+	T&	 _mutex;
+	bool _locked = false;
 };
 
 template <typename T>
@@ -44,16 +56,28 @@ class ReadScopedLockImpl {
 	ReadScopedLockImpl(T& mutex)
 		: _mutex(mutex) {
 		_mutex.rdlock();
+		_locked = true;
 	}
 
-	~ReadScopedLockImpl() { _mutex.unlock(); }
+	~ReadScopedLockImpl() { unlock(); }
 
-	void lock() { _mutex.rdlock(); }
+	void lock() {
+		if(!_locked) {
+			_mutex.rdlock();
+			_locked = true;
+		}
+	}
 
-	void unlock() { _mutex.unlock(); }
+	void unlock() {
+		if(_locked) {
+			_mutex.unlock();
+			_locked = false;
+		}
+	}
 
   private:
-	T& _mutex;
+	T&	 _mutex;
+	bool _locked = false;
 };
 
 template <typename T>
@@ -62,16 +86,28 @@ class WriteScopedLockImpl {
 	WriteScopedLockImpl(T& mutex)
 		: _mutex(mutex) {
 		_mutex.wrlock();
+		_locked = true;
 	}
 
-	~WriteScopedLockImpl() { _mutex.unlock(); }
+	~WriteScopedLockImpl() { unlock(); }
 
-	void lock() { _mutex.wrlock(); }
+	void lock() {
+		if(!_locked) {
+			_mutex.wrlock();
+			_locked = true;
+		}
+	}
 
-	void unlock() { _mutex.unlock(); }
+	void unlock() {
+		if(_locked) {
+			_mutex.unlock();
+			_locked = false;
+		}
+	}
 
   private:
-	T& _mutex;
+	T&	 _mutex;
+	bool _locked = false;
 };
 
 class Mutex : Noncopyable {
