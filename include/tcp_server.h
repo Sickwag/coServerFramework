@@ -126,7 +126,11 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>, private Noncop
 
 	const std::string& getName() const { return _name; }
 
-	void setName(const std::string& name) { _name = name; }
+	virtual void setName(const std::string& name) { _name = name; }
+
+	Address::ptr getLocalAddress() const {
+		return _socks.empty() ? nullptr : _socks[0]->getLocalAddress();
+	}
 
 	bool isStop() const { return _isStop; }
 
