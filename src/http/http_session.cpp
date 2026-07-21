@@ -43,29 +43,6 @@ HttpRequest::ptr HttpSession::recvRequest() {
 		}
 	} while(true);
 
-	int64_t length = static_cast<int64_t>(parser->getContentLength());
-	if(length > 0) {
-		std::string body;
-		body.resize(static_cast<size_t>(length));
-
-		int len = 0;
-		if(length >= offset) {
-			std::memcpy(&body[0], data, static_cast<size_t>(offset));
-			len = offset;
-		} else {
-			std::memcpy(&body[0], data, static_cast<size_t>(length));
-			len = static_cast<int>(length);
-		}
-		length -= offset;
-		if(length > 0) {
-			if(readFixSize(&body[static_cast<size_t>(len)], static_cast<size_t>(length)) <= 0) {
-				close();
-				return nullptr;
-			}
-		}
-		parser->getData()->setBody(body);
-	}
-
 	parser->getData()->init();
 	return parser->getData();
 }
