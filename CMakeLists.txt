@@ -37,7 +37,7 @@ find_library(HIREDIS_VIP_LIB hiredis_vip PATHS ${HIREDIS_VIP_DIR} NO_DEFAULT_PAT
 # =============================================================================
 # Library target
 # =============================================================================
-file(GLOB_RECURSE AZZATO_SRC CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE AZZATO_SRC CONFIGURE_DEPENDS "src/*.cpp" "src/*.c")
 list(FILTER AZZATO_SRC EXCLUDE REGEX "src/main\\.cpp$")
 
 add_library(azzato STATIC ${AZZATO_SRC})
