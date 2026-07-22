@@ -17,27 +17,28 @@ namespace azzato {
 struct TcpServerConf {
 	using ptr = std::shared_ptr<TcpServerConf>;
 
-	std::vector<std::string> address;
-	int						 keepalive = 0;
-	int						 timeout   = 1000 * 2 * 60;
-	int						 ssl	   = 0;
-	std::string				 id;
-	std::string				 type = "http";
-	std::string				 name;
-	std::string				 certFile;
-	std::string				 keyFile;
-	std::string				 acceptWorker;
-	std::string				 ioWorker;
-	std::string				 processWorker;
+	std::vector<std::string>		   address;
+	int								   keepalive = 0;
+	int								   timeout	 = 1000 * 2 * 60;
+	int								   ssl		 = 0;
+	std::string						   id;
+	std::string						   type = "http";
+	std::string						   name;
+	std::string						   certFile;
+	std::string						   keyFile;
+	std::string						   acceptWorker;
+	std::string						   ioWorker;
+	std::string						   processWorker;
 	std::map<std::string, std::string> args;
 
 	bool isValid() const { return !address.empty(); }
 
 	bool operator==(const TcpServerConf& other) const {
 		return address == other.address && keepalive == other.keepalive && timeout == other.timeout
-			   && name == other.name && ssl == other.ssl && certFile == other.certFile && keyFile == other.keyFile
-			   && acceptWorker == other.acceptWorker && ioWorker == other.ioWorker
-			   && processWorker == other.processWorker && args == other.args && id == other.id && type == other.type;
+			   && name == other.name && ssl == other.ssl && certFile == other.certFile
+			   && keyFile == other.keyFile && acceptWorker == other.acceptWorker && ioWorker == other.ioWorker
+			   && processWorker == other.processWorker && args == other.args && id == other.id
+			   && type == other.type;
 	}
 };
 
@@ -45,7 +46,7 @@ template <>
 class LexicalCast<std::string, TcpServerConf> {
   public:
 	TcpServerConf operator()(const std::string& v) {
-		YAML::Node	   node = YAML::Load(v);
+		YAML::Node	  node = YAML::Load(v);
 		TcpServerConf conf;
 		conf.id			   = node["id"].as<std::string>(conf.id);
 		conf.type		   = node["type"].as<std::string>(conf.type);
@@ -58,7 +59,8 @@ class LexicalCast<std::string, TcpServerConf> {
 		conf.acceptWorker  = node["accept_worker"].as<std::string>(conf.acceptWorker);
 		conf.ioWorker	   = node["io_worker"].as<std::string>(conf.ioWorker);
 		conf.processWorker = node["process_worker"].as<std::string>(conf.processWorker);
-		conf.args = LexicalCast<std::string, std::map<std::string, std::string>>()(node["args"].as<std::string>(""));
+		conf.args =
+			LexicalCast<std::string, std::map<std::string, std::string>>()(node["args"].as<std::string>(""));
 		if(node["address"].IsDefined()) {
 			for(size_t i = 0; i < node["address"].size(); ++i) {
 				conf.address.push_back(node["address"][i].as<std::string>());
@@ -112,7 +114,8 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>, private Noncop
 
 	virtual bool bind(Address::ptr addr, bool ssl = false);
 
-	virtual bool bind(const std::vector<Address::ptr>& addrs, std::vector<Address::ptr>& fails, bool ssl = false);
+	virtual bool
+	bind(const std::vector<Address::ptr>& addrs, std::vector<Address::ptr>& fails, bool ssl = false);
 
 	virtual bool start();
 
@@ -128,9 +131,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>, private Noncop
 
 	virtual void setName(const std::string& name) { _name = name; }
 
-	Address::ptr getLocalAddress() const {
-		return _socks.empty() ? nullptr : _socks[0]->getLocalAddress();
-	}
+	Address::ptr getLocalAddress() const { return _socks.empty() ? nullptr : _socks[0]->getLocalAddress(); }
 
 	bool isStop() const { return _isStop; }
 

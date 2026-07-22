@@ -74,13 +74,13 @@ class Fiber : public std::enable_shared_from_this<Fiber>, private Noncopyable {
 	static void callerMainFunc();
 
   private:
-	ucontext_t			   _context{};
-	std::function<void()>  _callback;
+	ucontext_t				_context{};
+	std::function<void()>	_callback;
 	std::unique_ptr<char[]> _stack;
-	size_t				   _stackSize = 0;
-	FiberState			   _state	   = FiberState::Init;
-	uint64_t			   _fiberId   = 0;
-	uint64_t			   _threadId  = 0;
+	size_t					_stackSize = 0;
+	FiberState				_state	   = FiberState::Init;
+	uint64_t				_fiberId   = 0;
+	uint64_t				_threadId  = 0;
 };
 
 }  // namespace azzato

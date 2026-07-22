@@ -24,18 +24,19 @@ int32_t Uri::getPort() const {
 Uri::ptr Uri::create(const std::string& uri) {
 	Uri::ptr result(new Uri);
 
-	size_t pos = 0;
+	size_t pos		 = 0;
 
 	// scheme://
 	size_t schemeEnd = uri.find("://");
 	if(schemeEnd != std::string::npos) {
 		result->_scheme = uri.substr(0, schemeEnd);
-		pos				 = schemeEnd + 3;
+		pos				= schemeEnd + 3;
 	}
 
 	// authority: [userinfo@]host[:port]
-	size_t pathStart = uri.find_first_of("/?#", pos);
-	std::string authority = (pathStart == std::string::npos) ? uri.substr(pos) : uri.substr(pos, pathStart - pos);
+	size_t		pathStart = uri.find_first_of("/?#", pos);
+	std::string authority =
+		(pathStart == std::string::npos) ? uri.substr(pos) : uri.substr(pos, pathStart - pos);
 
 	size_t at = authority.rfind('@');
 	if(at != std::string::npos) {
@@ -45,7 +46,7 @@ Uri::ptr Uri::create(const std::string& uri) {
 
 	size_t colon = authority.rfind(':');
 	if(colon != std::string::npos) {
-		result->_host = authority.substr(0, colon);
+		result->_host		= authority.substr(0, colon);
 		std::string portStr = authority.substr(colon + 1);
 		if(!portStr.empty()) {
 			result->_port = std::atoi(portStr.c_str());
@@ -57,7 +58,7 @@ Uri::ptr Uri::create(const std::string& uri) {
 	// path ? query # fragment
 	std::string rest = (pathStart == std::string::npos) ? "" : uri.substr(pathStart);
 
-	size_t fragPos = rest.find('#');
+	size_t fragPos	 = rest.find('#');
 	if(fragPos != std::string::npos) {
 		result->_fragment = rest.substr(fragPos + 1);
 		rest			  = rest.substr(0, fragPos);

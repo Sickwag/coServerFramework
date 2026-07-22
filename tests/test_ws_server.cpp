@@ -36,8 +36,8 @@ bool wsClientRoundTrip(azzato::Address::ptr addr) {
 
 	// Read and parse the 101 response
 	azzato::http::HttpResponseParser::ptr rspParser(new azzato::http::HttpResponseParser);
-	std::string							 responseBuffer;
-	char								 buf[256];
+	std::string							  responseBuffer;
+	char								  buf[256];
 	while(!rspParser->isFinished()) {
 		int n = stream->read(buf, sizeof(buf));
 		if(n <= 0) {
@@ -75,12 +75,13 @@ void testWsServer() {
 
 	azzato::http::WSServer::ptr server(new azzato::http::WSServer(&iom, &iom, &iom));
 	server->setName("azzato_ws_server");
-	server->getWSServletDispatch()->addServlet(
-		"/echo", [](azzato::http::HttpRequest::ptr, azzato::http::WSFrameMessage::ptr msg,
-					azzato::http::WSSession::ptr session) -> int32_t {
-			session->sendMessage(msg);
-			return 0;
-		});
+	server->getWSServletDispatch()->addServlet("/echo",
+											   [](azzato::http::HttpRequest::ptr,
+												  azzato::http::WSFrameMessage::ptr msg,
+												  azzato::http::WSSession::ptr		session) -> int32_t {
+												   session->sendMessage(msg);
+												   return 0;
+											   });
 
 	bool ok = false;
 	iom.schedule([&]() {

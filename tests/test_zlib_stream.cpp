@@ -1,5 +1,5 @@
-#include "streams/zlib_stream.h"
 #include "log.h"
+#include "streams/zlib_stream.h"
 #include "utils/macro.h"
 
 #include <cassert>
@@ -10,12 +10,12 @@ static azzato::Logger::ptr g_logger = azzato::LoggerMgr::getInstance()->getLogge
 
 void testRoundTrip() {
 	const std::string data = "hello zlib stream, compress and decompress me!";
-	std::string compressed;
+	std::string		  compressed;
 	{
 		auto compressor = azzato::ZlibStream::createGzip(true);
 		assert(compressor);
 		assert(compressor->write(data.data(), data.size()) >= 0);
-		compressor->close();	// flush
+		compressor->close();  // flush
 		compressed = compressor->getResult();
 	}
 	assert(!compressed.empty());
@@ -35,11 +35,11 @@ void testRoundTrip() {
 }
 
 void testDeflate() {
-	const std::string data = "deflate round trip payload";
-	auto			 compressor = azzato::ZlibStream::createDeflate(true);
+	const std::string data		 = "deflate round trip payload";
+	auto			  compressor = azzato::ZlibStream::createDeflate(true);
 	compressor->write(data.data(), data.size());
 	compressor->close();
-	auto compressed = compressor->getResult();
+	auto compressed	  = compressor->getResult();
 
 	auto decompressor = azzato::ZlibStream::createDeflate(false);
 	decompressor->write(compressed.data(), compressed.size());

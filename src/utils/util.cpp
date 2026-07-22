@@ -442,7 +442,7 @@ bool readFixFromStreamWithSpeed(std::istream& is, char* data, const uint64_t& si
 	return offset == size;
 }
 
-bool writeFixToStreamWithSpeed(std::ostream&  os,
+bool writeFixToStreamWithSpeed(std::ostream&   os,
 							   const char*	   data,
 							   const uint64_t& size,
 							   const uint64_t& speed) {

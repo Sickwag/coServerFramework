@@ -41,14 +41,14 @@ class FdCtx : public std::enable_shared_from_this<FdCtx>, private Noncopyable {
 	uint64_t getTimeout(int type);
 
   private:
-	bool	 _isInit		= false;
-	bool	 _isSocket		= false;
-	bool	 _sysNonblock	= false;
-	bool	 _userNonblock	= false;
-	bool	 _isClosed		= false;
-	int		 _fd			 = -1;
-	uint64_t _recvTimeout	 = static_cast<uint64_t>(-1);
-	uint64_t _sendTimeout	 = static_cast<uint64_t>(-1);
+	bool	 _isInit	   = false;
+	bool	 _isSocket	   = false;
+	bool	 _sysNonblock  = false;
+	bool	 _userNonblock = false;
+	bool	 _isClosed	   = false;
+	int		 _fd		   = -1;
+	uint64_t _recvTimeout  = static_cast<uint64_t>(-1);
+	uint64_t _sendTimeout  = static_cast<uint64_t>(-1);
 };
 
 /**
@@ -65,7 +65,7 @@ class FdManager {
 	void del(int fd);
 
   private:
-	RWMutexType			   _mutex;
+	RWMutexType				_mutex;
 	std::vector<FdCtx::ptr> _datas;
 };
 

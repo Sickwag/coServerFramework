@@ -15,14 +15,14 @@ uint8_t parseHttpVersion(const std::string& version) {
 	if(version.size() < 5 || version.compare(0, 5, "HTTP/") != 0) {
 		return 0;
 	}
-	const char* p  = version.c_str() + 5;
-	char*		end = nullptr;
+	const char* p	  = version.c_str() + 5;
+	char*		end	  = nullptr;
 	long		major = std::strtol(p, &end, 10);
 	if(end == p || *end != '.') {
 		return 0;
 	}
-	char* end2   = nullptr;
-	long minor   = std::strtol(end + 1, &end2, 10);
+	char* end2	= nullptr;
+	long  minor = std::strtol(end + 1, &end2, 10);
 	if(end2 == end + 1 || *end2 != '\0') {
 		return 0;
 	}
@@ -65,7 +65,7 @@ void HttpRequestParser::parseRequestLine(const std::string& line) {
 		return;
 	}
 
-	std::string uri = line.substr(sp1 + 1, sp2 - sp1 - 1);
+	std::string uri		= line.substr(sp1 + 1, sp2 - sp1 - 1);
 	std::string version = line.substr(sp2 + 1);
 
 	_data->setVersion(parseHttpVersion(version));
@@ -179,8 +179,9 @@ void HttpResponseParser::parseStatusLine(const std::string& line) {
 	}
 	_data->setVersion(parseHttpVersion(line.substr(0, sp1)));
 
-	size_t sp2 = line.find(' ', sp1 + 1);
-	std::string codeStr = (sp2 == std::string::npos) ? line.substr(sp1 + 1) : line.substr(sp1 + 1, sp2 - sp1 - 1);
+	size_t		sp2 = line.find(' ', sp1 + 1);
+	std::string codeStr =
+		(sp2 == std::string::npos) ? line.substr(sp1 + 1) : line.substr(sp1 + 1, sp2 - sp1 - 1);
 	try {
 		_data->setStatus(static_cast<HttpStatus>(std::stoi(codeStr)));
 	} catch(...) {

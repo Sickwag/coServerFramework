@@ -12,8 +12,9 @@ namespace azzato {
 namespace http {
 
 namespace {
-ConfigVar<uint32_t>::ptr g_websocketMessageMaxSize =
-	Config::lookup("websocket.message.max_size", static_cast<uint32_t>(1024 * 1024 * 32), "websocket message max size");
+ConfigVar<uint32_t>::ptr g_websocketMessageMaxSize = Config::lookup("websocket.message.max_size",
+																	static_cast<uint32_t>(1024 * 1024 * 32),
+																	"websocket message max size");
 }
 
 WSSession::WSSession(Socket::ptr sock, bool owner)
@@ -141,7 +142,8 @@ WSFrameMessage::ptr wsRecvMessage(Stream* stream, bool client) {
 				}
 			}
 			data.resize(static_cast<size_t>(currentLength) + static_cast<size_t>(length));
-			if(stream->readFixSize(&data[static_cast<size_t>(currentLength)], static_cast<size_t>(length)) <= 0) {
+			if(stream->readFixSize(&data[static_cast<size_t>(currentLength)], static_cast<size_t>(length))
+			   <= 0) {
 				break;
 			}
 			if(wsHead.mask) {
@@ -170,9 +172,9 @@ int32_t wsSendMessage(Stream* stream, WSFrameMessage::ptr msg, bool client, bool
 	do {
 		WSFrameHead wsHead;
 		std::memset(&wsHead, 0, sizeof(wsHead));
-		wsHead.fin	= fin;
+		wsHead.fin	  = fin;
 		wsHead.opcode = static_cast<uint32_t>(msg->getOpcode());
-		wsHead.mask	= client;
+		wsHead.mask	  = client;
 		uint64_t size = msg->getData().size();
 		if(size < 126) {
 			wsHead.payload = static_cast<uint32_t>(size);
@@ -197,8 +199,8 @@ int32_t wsSendMessage(Stream* stream, WSFrameMessage::ptr msg, bool client, bool
 			}
 		}
 		if(client) {
-			char	   mask[4];
-			uint32_t   randValue = static_cast<uint32_t>(std::rand());
+			char	 mask[4];
+			uint32_t randValue = static_cast<uint32_t>(std::rand());
 			std::memcpy(mask, &randValue, sizeof(mask));
 			std::string& payload = msg->getData();
 			for(size_t i = 0; i < payload.size(); ++i) {
@@ -221,9 +223,9 @@ int32_t wsSendMessage(Stream* stream, WSFrameMessage::ptr msg, bool client, bool
 int32_t wsPing(Stream* stream) {
 	WSFrameHead wsHead;
 	std::memset(&wsHead, 0, sizeof(wsHead));
-	wsHead.fin	= 1;
+	wsHead.fin	  = 1;
 	wsHead.opcode = WSFrameHead::Ping;
-	int32_t v	= stream->writeFixSize(&wsHead, sizeof(wsHead));
+	int32_t v	  = stream->writeFixSize(&wsHead, sizeof(wsHead));
 	if(v <= 0) {
 		stream->close();
 	}
@@ -233,9 +235,9 @@ int32_t wsPing(Stream* stream) {
 int32_t wsPong(Stream* stream) {
 	WSFrameHead wsHead;
 	std::memset(&wsHead, 0, sizeof(wsHead));
-	wsHead.fin	= 1;
+	wsHead.fin	  = 1;
 	wsHead.opcode = WSFrameHead::Pong;
-	int32_t v	= stream->writeFixSize(&wsHead, sizeof(wsHead));
+	int32_t v	  = stream->writeFixSize(&wsHead, sizeof(wsHead));
 	if(v <= 0) {
 		stream->close();
 	}

@@ -11,7 +11,8 @@ FunctionServlet::FunctionServlet(callback cb)
 	: Servlet("FunctionServlet")
 	, _cb(std::move(cb)) {}
 
-int32_t FunctionServlet::handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) {
+int32_t
+FunctionServlet::handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) {
 	return _cb(request, response, session);
 }
 
@@ -20,7 +21,8 @@ ServletDispatch::ServletDispatch()
 	_defaultServlet.reset(new NotFoundServlet("azzato/1.0.0"));
 }
 
-int32_t ServletDispatch::handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) {
+int32_t
+ServletDispatch::handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) {
 	auto servlet = getMatchedServlet(request->getPath());
 	if(servlet) {
 		servlet->handle(request, response, session);
@@ -132,10 +134,12 @@ NotFoundServlet::NotFoundServlet(const std::string& name)
 	: Servlet("NotFoundServlet")
 	, _name(name) {
 	_content = "<html><head><title>404 Not Found</title></head><body><center><h1>404 Not Found</h1></center>"
-			   "<hr><center>" + name + "</center></body></html>";
+			   "<hr><center>"
+			   + name + "</center></body></html>";
 }
 
-int32_t NotFoundServlet::handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) {
+int32_t
+NotFoundServlet::handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) {
 	response->setStatus(http::HttpStatus::NotFound);
 	response->setHeader("Server", "azzato/1.0.0");
 	response->setHeader("Content-Type", "text/html");

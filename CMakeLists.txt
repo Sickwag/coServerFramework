@@ -78,6 +78,16 @@ add_executable(azzatoBackend main.cpp)
 target_link_libraries(azzatoBackend PRIVATE azzato)
 
 # =============================================================================
+# Examples
+# =============================================================================
+file(GLOB EXAMPLE_SRCS CONFIGURE_DEPENDS "examples/*.cpp")
+foreach(example_src ${EXAMPLE_SRCS})
+	get_filename_component(example_name ${example_src} NAME_WE)
+	add_executable(${example_name} ${example_src})
+	target_link_libraries(${example_name} PRIVATE azzato)
+endforeach()
+
+# =============================================================================
 # Tests: each tests/*.cpp is a standalone executable with its own main()
 # =============================================================================
 if(BUILD_TEST)

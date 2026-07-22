@@ -13,7 +13,7 @@ namespace azzato {
 namespace {
 ConfigVar<int>::ptr g_tcpConnectTimeout = Config::lookup("tcp.connect.timeout", 5000, "tcp connect timeout");
 
-thread_local bool t_hookEnable = false;
+thread_local bool t_hookEnable			= false;
 }  // namespace
 
 #define HOOK_FUN(XX) \
@@ -103,7 +103,7 @@ doIo(int fd, OriginFun fun, const char* hookFunName, uint32_t event, int timeout
 		return fun(fd, std::forward<Args>(args)...);
 	}
 
-	uint64_t					timeout = ctx->getTimeout(timeoutSo);
+	uint64_t				   timeout = ctx->getTimeout(timeoutSo);
 	std::shared_ptr<TimerInfo> tinfo(new TimerInfo);
 
 retry:
@@ -112,8 +112,8 @@ retry:
 		n = fun(fd, std::forward<Args>(args)...);
 	}
 	if(n == -1 && errno == EAGAIN) {
-		IOManager*				  iom = IOManager::getThis();
-		Timer::ptr				  timer;
+		IOManager*				 iom = IOManager::getThis();
+		Timer::ptr				 timer;
 		std::weak_ptr<TimerInfo> winfo(tinfo);
 
 		if(timeout != static_cast<uint64_t>(-1)) {
@@ -194,9 +194,9 @@ int nanosleep(const struct timespec* req, struct timespec* rem) {
 		return nanosleep_f(req, rem);
 	}
 
-	int				  timeout_ms = req->tv_sec * 1000 + req->tv_nsec / 1000 / 1000;
-	azzato::Fiber::ptr fiber	 = azzato::Fiber::getThis();
-	azzato::IOManager* iom		 = azzato::IOManager::getThis();
+	int				   timeout_ms = req->tv_sec * 1000 + req->tv_nsec / 1000 / 1000;
+	azzato::Fiber::ptr fiber	  = azzato::Fiber::getThis();
+	azzato::IOManager* iom		  = azzato::IOManager::getThis();
 	if(!iom) {
 		return nanosleep_f(req, rem);
 	}
@@ -242,8 +242,8 @@ int connect_with_timeout(int fd, const struct sockaddr* addr, socklen_t addrlen,
 		return n;
 	}
 
-	azzato::IOManager*		 iom = azzato::IOManager::getThis();
-	azzato::Timer::ptr		 timer;
+	azzato::IOManager*		   iom = azzato::IOManager::getThis();
+	azzato::Timer::ptr		   timer;
 	std::shared_ptr<TimerInfo> tinfo(new TimerInfo);
 	std::weak_ptr<TimerInfo>   winfo(tinfo);
 
@@ -314,14 +314,18 @@ ssize_t recv(int sockfd, void* buf, size_t len, int flags) {
 	return azzato::doIo(sockfd, recv_f, "recv", azzato::IOManager::Read, SO_RCVTIMEO, buf, len, flags);
 }
 
-ssize_t recvfrom(int sockfd,
-				 void*		 buf,
-				 size_t		 len,
-				 int		 flags,
-				 struct sockaddr* src_addr,
-				 socklen_t*	 addrlen) {
-	return azzato::doIo(
-		sockfd, recvfrom_f, "recvfrom", azzato::IOManager::Read, SO_RCVTIMEO, buf, len, flags, src_addr, addrlen);
+ssize_t
+recvfrom(int sockfd, void* buf, size_t len, int flags, struct sockaddr* src_addr, socklen_t* addrlen) {
+	return azzato::doIo(sockfd,
+						recvfrom_f,
+						"recvfrom",
+						azzato::IOManager::Read,
+						SO_RCVTIMEO,
+						buf,
+						len,
+						flags,
+						src_addr,
+						addrlen);
 }
 
 ssize_t recvmsg(int sockfd, struct msghdr* msg, int flags) {
@@ -340,13 +344,9 @@ ssize_t send(int s, const void* msg, size_t len, int flags) {
 	return azzato::doIo(s, send_f, "send", azzato::IOManager::Write, SO_SNDTIMEO, msg, len, flags);
 }
 
-ssize_t sendto(int s,
-			   const void* msg,
-			   size_t		 len,
-			   int		 flags,
-			   const struct sockaddr* to,
-			   socklen_t	 tolen) {
-	return azzato::doIo(s, sendto_f, "sendto", azzato::IOManager::Write, SO_SNDTIMEO, msg, len, flags, to, tolen);
+ssize_t sendto(int s, const void* msg, size_t len, int flags, const struct sockaddr* to, socklen_t tolen) {
+	return azzato::doIo(
+		s, sendto_f, "sendto", azzato::IOManager::Write, SO_SNDTIMEO, msg, len, flags, to, tolen);
 }
 
 ssize_t sendmsg(int s, const struct msghdr* msg, int flags) {
@@ -390,7 +390,7 @@ int fcntl(int fd, int cmd, ... /* arg */) {
 	} break;
 	case F_GETFL: {
 		va_end(va);
-		int				  arg = fcntl_f(fd, cmd);
+		int				   arg = fcntl_f(fd, cmd);
 		azzato::FdCtx::ptr ctx = azzato::FdMgr::getInstance()->get(fd);
 		if(!ctx || ctx->isClosed() || !ctx->isSocket()) {
 			return arg;
@@ -452,7 +452,7 @@ int ioctl(int d, unsigned long int request, ...) {
 	va_end(va);
 
 	if(FIONBIO == request) {
-		bool			  userNonblock = !!(*(int*)arg);
+		bool			   userNonblock = !!(*(int*)arg);
 		azzato::FdCtx::ptr ctx			= azzato::FdMgr::getInstance()->get(d);
 		if(!ctx || ctx->isClosed() || !ctx->isSocket()) {
 			return ioctl_f(d, request, arg);

@@ -1,5 +1,5 @@
-#include "socket.h"
 #include "log.h"
+#include "socket.h"
 #include "utils/macro.h"
 
 #include <cassert>
@@ -10,7 +10,7 @@ static azzato::Logger::ptr g_logger = azzato::LoggerMgr::getInstance()->getLogge
 // Blocking echo over a local TCP socket, exercising bind/listen/accept/connect/send/recv.
 void testTcpEcho() {
 	auto server = azzato::Socket::createTcpSocket();
-	auto addr	  = azzato::IPv4Address::create("127.0.0.1", 0);
+	auto addr	= azzato::IPv4Address::create("127.0.0.1", 0);
 	assert(server->bind(addr));
 	assert(server->listen());
 
@@ -24,8 +24,8 @@ void testTcpEcho() {
 	assert(conn);
 	AZZATO_LOG_INFO(g_logger) << "accepted: " << conn->toString();
 
-	const char* msg = "hello socket";
-	ssize_t sent	 = client->send(msg, std::strlen(msg));
+	const char* msg	 = "hello socket";
+	ssize_t		sent = client->send(msg, std::strlen(msg));
 	assert(sent == static_cast<ssize_t>(std::strlen(msg)));
 
 	char buf[64] = {0};

@@ -22,10 +22,10 @@ bool FdCtx::init() {
 
 	struct stat fd_stat;
 	if(-1 == fstat(_fd, &fd_stat)) {
-		_isInit   = false;
+		_isInit	  = false;
 		_isSocket = false;
 	} else {
-		_isInit   = true;
+		_isInit	  = true;
 		_isSocket = S_ISSOCK(fd_stat.st_mode);
 	}
 

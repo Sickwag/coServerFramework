@@ -205,7 +205,8 @@ RSACipher::ptr RSACipher::Create(const std::string& pubkey_file, const std::stri
 }
 
 RSACipher::RSACipher()
-	: _pubkey(nullptr), _prikey(nullptr) {}
+	: _pubkey(nullptr)
+	, _prikey(nullptr) {}
 
 RSACipher::~RSACipher() {
 	if(_pubkey) {

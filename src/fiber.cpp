@@ -9,10 +9,10 @@
 namespace azzato {
 
 namespace {
-constexpr size_t DEFAULT_STACK_SIZE = 128 * 1024;  // 128KB
+constexpr size_t DEFAULT_STACK_SIZE	   = 128 * 1024;  // 128KB
 
-thread_local Fiber*		 t_fiber		  = nullptr;	// fiber currently executing on this thread
-thread_local Fiber::ptr  t_thread_fiber  = nullptr;	// this thread's main fiber
+thread_local Fiber*		t_fiber		   = nullptr;  // fiber currently executing on this thread
+thread_local Fiber::ptr t_thread_fiber = nullptr;  // this thread's main fiber
 
 std::atomic<uint64_t> s_fiberId{0};
 std::atomic<uint64_t> s_fiberCount{0};
@@ -50,9 +50,7 @@ Fiber::Fiber(std::function<void()> callback, size_t stackSize, bool useCaller)
 	}
 }
 
-Fiber::~Fiber() {
-	--s_fiberCount;
-}
+Fiber::~Fiber() { --s_fiberCount; }
 
 void Fiber::reset(std::function<void()> callback) {
 	AZZATO_ASSERT(_stack);
@@ -89,7 +87,7 @@ void Fiber::back() {
 void Fiber::swapIn() {
 	setThis(shared_from_this());
 	AZZATO_ASSERT(getState() != FiberState::Execute);
-	_state		   = FiberState::Execute;
+	_state			= FiberState::Execute;
 	auto main_fiber = Scheduler::getMainFiber();
 	if(!main_fiber) {
 		main_fiber = t_thread_fiber;

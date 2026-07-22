@@ -1,6 +1,6 @@
 #include "timer.h"
-#include "utils/util.h"
 #include "utils/macro.h"
+#include "utils/util.h"
 
 namespace azzato {
 
@@ -38,7 +38,7 @@ bool Timer::cancel() {
 	TimerManager::RWMutexType::WriteLock lock(_manager->_mutex);
 	if(_callback) {
 		_callback = nullptr;
-		auto it	= _manager->_timers.find(shared_from_this());
+		auto it	  = _manager->_timers.find(shared_from_this());
 		if(it != _manager->_timers.end()) {
 			_manager->_timers.erase(it);
 		}
@@ -81,7 +81,7 @@ bool Timer::reset(uint64_t ms, bool fromNow) {
 	} else {
 		start = _next - _ms;
 	}
-	_ms   = ms;
+	_ms	  = ms;
 	_next = start + _ms;
 	_manager->addTimer(shared_from_this(), lock);
 	return true;
@@ -147,7 +147,7 @@ void TimerManager::listExpiredCb(std::vector<std::function<void()>>& callbacks) 
 	}
 
 	Timer::ptr now_timer(new Timer(now_ms));
-	auto	   it	 = rollover ? _timers.end() : _timers.lower_bound(now_timer);
+	auto	   it = rollover ? _timers.end() : _timers.lower_bound(now_timer);
 	while(it != _timers.end() && (*it)->_next == now_ms) {
 		++it;
 	}
@@ -167,7 +167,7 @@ void TimerManager::listExpiredCb(std::vector<std::function<void()>>& callbacks) 
 }
 
 void TimerManager::addTimer(Timer::ptr timer, RWMutexType::WriteLock& lock) {
-	auto it		= _timers.insert(timer).first;
+	auto it		 = _timers.insert(timer).first;
 	bool atFront = (it == _timers.begin()) && !_tickled;
 	if(atFront) {
 		_tickled = true;

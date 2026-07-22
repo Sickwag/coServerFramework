@@ -17,7 +17,7 @@ HttpSession::HttpSession(Socket::ptr sock, bool owner)
 HttpRequest::ptr HttpSession::recvRequest() {
 	HttpRequestParser::ptr parser(new HttpRequestParser);
 	auto				   buffer = std::make_unique<char[]>(REQUEST_BUFFER_SIZE);
-	char*				   data   = buffer.get();
+	char*				   data	  = buffer.get();
 	int					   offset = 0;
 
 	do {

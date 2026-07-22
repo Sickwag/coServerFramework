@@ -1,8 +1,8 @@
 #include "db/redis.h"
+#include "log.h"
 #include "scheduler.h"
 #include "utils/config.h"
 #include "utils/hash_util.h"
-#include "log.h"
 #include "utils/macro.h"
 
 namespace azzato {

@@ -11,11 +11,11 @@ namespace azzato {
  */
 class Stream {
   public:
-	using ptr = std::shared_ptr<Stream>;
+	using ptr										   = std::shared_ptr<Stream>;
 
-	virtual ~Stream() = default;
+	virtual ~Stream()								   = default;
 
-	virtual int read(void* buffer, size_t length) = 0;
+	virtual int read(void* buffer, size_t length)	   = 0;
 
 	virtual int read(ByteArray::ptr ba, size_t length) = 0;
 
@@ -25,7 +25,7 @@ class Stream {
 
 	virtual int write(const void* buffer, size_t length) = 0;
 
-	virtual int write(ByteArray::ptr ba, size_t length) = 0;
+	virtual int write(ByteArray::ptr ba, size_t length)	 = 0;
 
 	virtual int writeFixSize(const void* buffer, size_t length);
 

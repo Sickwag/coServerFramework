@@ -77,6 +77,7 @@ void Socket::setSendTimeout(int64_t value) {
 	struct timeval tv {
 		static_cast<int>(value / 1000), static_cast<int>(value % 1000 * 1000)
 	};
+
 	setOption(SOL_SOCKET, SO_SNDTIMEO, tv);
 }
 
@@ -92,6 +93,7 @@ void Socket::setRecvTimeout(int64_t value) {
 	struct timeval tv {
 		static_cast<int>(value / 1000), static_cast<int>(value % 1000 * 1000)
 	};
+
 	setOption(SOL_SOCKET, SO_RCVTIMEO, tv);
 }
 
@@ -120,8 +122,8 @@ Socket::ptr Socket::accept() {
 	Socket::ptr sock(new Socket(_family, _type, _protocol));
 	int			newsock = ::accept(_sock, nullptr, nullptr);
 	if(newsock == -1) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "accept(" << _sock << ") errno=" << errno
-											<< " errstr=" << std::strerror(errno);
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "accept(" << _sock << ") errno=" << errno << " errstr=" << std::strerror(errno);
 		return nullptr;
 	}
 	if(sock->init(newsock)) {
@@ -168,7 +170,8 @@ bool Socket::bind(const Address::ptr addr) {
 	}
 
 	if(::bind(_sock, addr->getAddr(), addr->getAddrLen())) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "bind error errno=" << errno << " errstr=" << std::strerror(errno);
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "bind error errno=" << errno << " errstr=" << std::strerror(errno);
 		return false;
 	}
 	getLocalAddress();
@@ -194,9 +197,8 @@ bool Socket::connect(const Address::ptr addr, uint64_t timeoutMs) {
 	}
 
 	if(AZZATO_UNLIKELY(addr->getFamily() != _family)) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
-			<< "connect sock.family(" << _family << ") addr.family(" << addr->getFamily()
-			<< ") not equal, addr=" << addr->toString();
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "connect sock.family(" << _family << ") addr.family("
+											<< addr->getFamily() << ") not equal, addr=" << addr->toString();
 		return false;
 	}
 
@@ -229,7 +231,8 @@ bool Socket::listen(int backlog) {
 		return false;
 	}
 	if(::listen(_sock, backlog)) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "listen error errno=" << errno << " errstr=" << std::strerror(errno);
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "listen error errno=" << errno << " errstr=" << std::strerror(errno);
 		return false;
 	}
 	return true;
@@ -441,9 +444,8 @@ void Socket::newSock() {
 	if(AZZATO_LIKELY(_sock != -1)) {
 		initSock();
 	} else {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
-			<< "socket(" << _family << ", " << _type << ", " << _protocol << ") errno=" << errno
-			<< " errstr=" << std::strerror(errno);
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "socket(" << _family << ", " << _type << ", " << _protocol
+											<< ") errno=" << errno << " errstr=" << std::strerror(errno);
 	}
 }
 
@@ -462,8 +464,8 @@ Socket::ptr SSLSocket::accept() {
 	SSLSocket::ptr sock(new SSLSocket(_family, _type, _protocol));
 	int			   newsock = ::accept(_sock, nullptr, nullptr);
 	if(newsock == -1) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "accept(" << _sock << ") errno=" << errno
-											<< " errstr=" << std::strerror(errno);
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "accept(" << _sock << ") errno=" << errno << " errstr=" << std::strerror(errno);
 		return nullptr;
 	}
 	sock->_ctx = _ctx;
@@ -581,8 +583,8 @@ bool SSLSocket::loadCertificates(const std::string& certFile, const std::string&
 		return false;
 	}
 	if(SSL_CTX_check_private_key(_ctx.get()) != 1) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "SSL_CTX_check_private_key cert_file=" << certFile
-											<< " key_file=" << keyFile;
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "SSL_CTX_check_private_key cert_file=" << certFile << " key_file=" << keyFile;
 		return false;
 	}
 	return true;

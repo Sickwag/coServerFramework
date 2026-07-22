@@ -15,7 +15,7 @@ void testHookedSleep() {
 	azzato::IOManager iom(2, false, "iomanager");
 	int				  done = 0;
 
-	auto tick = [&done]() { ++done; };
+	auto tick			   = [&done]() { ++done; };
 
 	iom.schedule([tick]() {
 		sleep(2);

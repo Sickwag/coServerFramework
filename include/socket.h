@@ -15,8 +15,8 @@ namespace azzato {
 
 class Socket : public std::enable_shared_from_this<Socket>, private Noncopyable {
   public:
-	using ptr		= std::shared_ptr<Socket>;
-	using weak_ptr	= std::weak_ptr<Socket>;
+	using ptr	   = std::shared_ptr<Socket>;
+	using weak_ptr = std::weak_ptr<Socket>;
 
 	enum Type {
 		Tcp = SOCK_STREAM,
@@ -138,11 +138,11 @@ class Socket : public std::enable_shared_from_this<Socket>, private Noncopyable 
 	virtual bool init(int sock);
 
   protected:
-	int		   _sock;
-	int		   _family;
-	int		   _type;
-	int		   _protocol;
-	bool	   _isConnected;
+	int			 _sock;
+	int			 _family;
+	int			 _type;
+	int			 _protocol;
+	bool		 _isConnected;
 	Address::ptr _localAddress;
 	Address::ptr _remoteAddress;
 };
@@ -173,8 +173,8 @@ class SSLSocket : public Socket {
 	int			recvFrom(void* buffer, size_t length, Address::ptr from, int flags = 0) override;
 	int			recvFrom(iovec* buffers, size_t length, Address::ptr from, int flags = 0) override;
 
-	bool				  loadCertificates(const std::string& certFile, const std::string& keyFile);
-	std::ostream&		  dump(std::ostream& os) const override;
+	bool		  loadCertificates(const std::string& certFile, const std::string& keyFile);
+	std::ostream& dump(std::ostream& os) const override;
 
   protected:
 	bool init(int sock) override;

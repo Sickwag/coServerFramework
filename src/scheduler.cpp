@@ -5,7 +5,7 @@
 namespace azzato {
 
 namespace {
-thread_local Scheduler*	t_scheduler	  = nullptr;
+thread_local Scheduler* t_scheduler		  = nullptr;
 thread_local Fiber::ptr t_scheduler_fiber = nullptr;
 }  // namespace
 
@@ -24,7 +24,7 @@ Scheduler::Scheduler(size_t threads, bool useCaller, const std::string& name)
 		setNameOfThread(_name);
 
 		t_scheduler_fiber = _rootFiber;
-		_rootThread		   = static_cast<int>(Thread::getCurrentThreadId());
+		_rootThread		  = static_cast<int>(Thread::getCurrentThreadId());
 		_threadIds.push_back(_rootThread);
 	} else {
 		_rootThread = -1;
@@ -64,7 +64,8 @@ void Scheduler::start() {
 void Scheduler::stop() {
 	_autoStop = true;
 	if(_rootFiber && _threadCount == 0
-	   && (_rootFiber->getState() == Fiber::FiberState::Terminate || _rootFiber->getState() == Fiber::FiberState::Init)) {
+	   && (_rootFiber->getState() == Fiber::FiberState::Terminate
+		   || _rootFiber->getState() == Fiber::FiberState::Init)) {
 		AZZATO_LOG_INFO(AZZATO_LOG_ROOT()) << this << " stopped";
 		_stopping.store(true);
 
@@ -130,9 +131,7 @@ std::ostream& Scheduler::dump(std::ostream& os) {
 	return os;
 }
 
-void Scheduler::tickle() {
-	AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "tickle";
-}
+void Scheduler::tickle() { AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "tickle"; }
 
 bool Scheduler::stopping() {
 	MutexType::Lock lock(_mutex);
@@ -153,8 +152,8 @@ void Scheduler::run() {
 		t_scheduler_fiber = Fiber::getThis();
 	}
 
-	Fiber::ptr idle_fiber(new Fiber(std::bind(&Scheduler::idle, this)));
-	Fiber::ptr cb_fiber;
+	Fiber::ptr	   idle_fiber(new Fiber(std::bind(&Scheduler::idle, this)));
+	Fiber::ptr	   cb_fiber;
 	FiberAndThread ft;
 
 	while(true) {
@@ -177,7 +176,7 @@ void Scheduler::run() {
 					continue;
 				}
 
-				ft		  = *it;
+				ft = *it;
 				_fibers.erase(it++);
 				++_activeThreadCount;
 				is_active = true;
@@ -234,7 +233,8 @@ void Scheduler::run() {
 			++_idleThreadCount;
 			idle_fiber->swapIn();
 			--_idleThreadCount;
-			if(idle_fiber->getState() != Fiber::FiberState::Terminate && idle_fiber->getState() != Fiber::FiberState::Exception) {
+			if(idle_fiber->getState() != Fiber::FiberState::Terminate
+			   && idle_fiber->getState() != Fiber::FiberState::Exception) {
 				idle_fiber->_state = Fiber::FiberState::Holding;
 			}
 		}

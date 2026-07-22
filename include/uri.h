@@ -8,8 +8,8 @@ namespace azzato {
 
 /*
    foo://user@sylar.com:8042/over/there?name=ferret#nose
-     \_/   \______________/\_________/ \_________/ \__/
-      |           |            |            |        |
+	 \_/   \______________/\_________/ \_________/ \__/
+	  |           |            |            |        |
    scheme     authority       path        query   fragment
 */
 

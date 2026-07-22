@@ -17,13 +17,13 @@ namespace azzato {
 
 class Scheduler : private Noncopyable {
   public:
-	using ptr		   = std::shared_ptr<Scheduler>;
+	using ptr		= std::shared_ptr<Scheduler>;
 	using MutexType = Mutex;
 
 	struct FiberAndThread {
-		Fiber::ptr			   fiber;
+		Fiber::ptr			  fiber;
 		std::function<void()> callback;
-		int					   thread = -1;
+		int					  thread = -1;
 
 		void reset() {
 			fiber	 = nullptr;
@@ -55,7 +55,7 @@ class Scheduler : private Noncopyable {
 		bool need_tickle = false;
 		{
 			MutexType::Lock lock(_mutex);
-			need_tickle	   = scheduleLock(std::forward<FiberOrCb>(fc), thread);
+			need_tickle = scheduleLock(std::forward<FiberOrCb>(fc), thread);
 		}
 		if(need_tickle) {
 			tickle();
@@ -121,10 +121,10 @@ class Scheduler : private Noncopyable {
 	std::atomic<size_t>		  _activeThreadCount{0};
 	std::atomic<size_t>		  _idleThreadCount{0};
 	std::atomic<bool>		  _stopping{true};
-	bool					  _autoStop   = false;
-	int						  _rootThread = -1;
-	bool					  _useCaller  = false;
-	bool					  _root	   = false;
+	bool					  _autoStop	   = false;
+	int						  _rootThread  = -1;
+	bool					  _useCaller   = false;
+	bool					  _root		   = false;
 	uint32_t				  _threadCount = 0;
 	Fiber::ptr				  _rootFiber;
 };

@@ -1,20 +1,20 @@
 #include "thread.h"
 #include "utils/macro.h"
 
-#include <sys/syscall.h>
-#include <unistd.h>
 #include <atomic>
 #include <cstring>
 #include <exception>
 #include <pthread.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
 namespace azzato {
 
 namespace {
-thread_local Thread*	   t_thread		 = nullptr;
-thread_local std::string  t_thread_name = "unknown";
-std::atomic<uint32_t>	   s_threadCount{0};
-std::atomic<uint64_t>	   s_threadId{0};
+thread_local Thread*	 t_thread	   = nullptr;
+thread_local std::string t_thread_name = "unknown";
+std::atomic<uint32_t>	 s_threadCount{0};
+std::atomic<uint64_t>	 s_threadId{0};
 }  // namespace
 
 Thread::Thread(std::function<void()> callback, const std::string& name)
@@ -22,10 +22,10 @@ Thread::Thread(std::function<void()> callback, const std::string& name)
 	, _name(name) {
 	AZZATO_ASSERT(_callback);
 	_thread = std::thread([this] {
-		t_thread			 = this;
-		t_thread_name		 = _name;
-		_threadId			 = static_cast<uint64_t>(::syscall(SYS_gettid));
-		s_threadId			 = _threadId;
+		t_thread	  = this;
+		t_thread_name = _name;
+		_threadId	  = static_cast<uint64_t>(::syscall(SYS_gettid));
+		s_threadId	  = _threadId;
 		++s_threadCount;
 		pthread_setname_np(pthread_self(), _name.substr(0, 15).c_str());
 		try {
@@ -61,9 +61,7 @@ void Thread::setNameOfThis(const std::string& name) {
 
 void Thread::yield() { ::sched_yield(); }
 
-uint64_t Thread::getCurrentThreadId() {
-	return static_cast<uint64_t>(::syscall(SYS_gettid));
-}
+uint64_t Thread::getCurrentThreadId() { return static_cast<uint64_t>(::syscall(SYS_gettid)); }
 
 uint32_t Thread::getTotalThreads() { return s_threadCount.load(); }
 

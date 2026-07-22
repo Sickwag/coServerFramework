@@ -31,7 +31,7 @@ class WSServlet {
 
 class FunctionWSServlet : public WSServlet {
   public:
-	using ptr		 = std::shared_ptr<FunctionWSServlet>;
+	using ptr	   = std::shared_ptr<FunctionWSServlet>;
 	using callback = std::function<int32_t(HttpRequest::ptr, WSFrameMessage::ptr, WSSession::ptr)>;
 
 	FunctionWSServlet(callback cb, const std::string& name = "FunctionWSServlet");
@@ -44,7 +44,7 @@ class FunctionWSServlet : public WSServlet {
 
 class WSServletDispatch {
   public:
-	using ptr		   = std::shared_ptr<WSServletDispatch>;
+	using ptr		  = std::shared_ptr<WSServletDispatch>;
 	using RWMutexType = RWMutex;
 
 	WSServletDispatch();
@@ -70,10 +70,10 @@ class WSServletDispatch {
 	WSServlet::ptr getMatchedWSServlet(const std::string& uri);
 
   private:
-	RWMutexType												 _mutex;
-	std::unordered_map<std::string, WSServlet::ptr>			 _datas;
-	std::vector<std::pair<std::string, WSServlet::ptr>>		 _globs;
-	WSServlet::ptr											 _defaultServlet;
+	RWMutexType											_mutex;
+	std::unordered_map<std::string, WSServlet::ptr>		_datas;
+	std::vector<std::pair<std::string, WSServlet::ptr>> _globs;
+	WSServlet::ptr										_defaultServlet;
 };
 
 }  // namespace http

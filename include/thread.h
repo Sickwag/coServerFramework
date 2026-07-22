@@ -37,10 +37,10 @@ class Thread : private Noncopyable {
 	void runCallback();
 
   private:
-	std::thread			   _thread;
+	std::thread			  _thread;
 	std::function<void()> _callback;
-	std::string			   _name;
-	uint64_t			   _threadId = 0;
+	std::string			  _name;
+	uint64_t			  _threadId = 0;
 };
 
 }  // namespace azzato

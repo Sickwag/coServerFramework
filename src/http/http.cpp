@@ -1,6 +1,6 @@
 #include "http/http.h"
-#include "utils/util.h"
 #include "utils/macro.h"
+#include "utils/util.h"
 
 #include <cstring>
 #include <sstream>
@@ -9,9 +9,9 @@ namespace azzato {
 namespace http {
 
 HttpMethod stringToHttpMethod(const std::string& m) {
-#define XX(num, name, string)             \
+#define XX(num, name, string)                  \
 	if(std::strcmp(#string, m.c_str()) == 0) { \
-		return HttpMethod::name;          \
+		return HttpMethod::name;               \
 	}
 	HTTP_METHOD_MAP(XX);
 #undef XX
@@ -19,9 +19,9 @@ HttpMethod stringToHttpMethod(const std::string& m) {
 }
 
 HttpMethod charsToHttpMethod(const char* m) {
-#define XX(num, name, string)                       \
+#define XX(num, name, string)                                 \
 	if(std::strncmp(#string, m, std::strlen(#string)) == 0) { \
-		return HttpMethod::name;                    \
+		return HttpMethod::name;                              \
 	}
 	HTTP_METHOD_MAP(XX);
 #undef XX
@@ -147,8 +147,8 @@ std::string HttpRequest::toString() const {
 
 std::ostream& HttpRequest::dump(std::ostream& os) const {
 	os << httpMethodToString(_method) << " " << _path << (_query.empty() ? "" : "?") << _query
-	   << (_fragment.empty() ? "" : "#") << _fragment << " HTTP/" << (static_cast<uint32_t>(_version >> 4)) << "."
-	   << (static_cast<uint32_t>(_version & 0x0F)) << "\r\n";
+	   << (_fragment.empty() ? "" : "#") << _fragment << " HTTP/" << (static_cast<uint32_t>(_version >> 4))
+	   << "." << (static_cast<uint32_t>(_version & 0x0F)) << "\r\n";
 	if(!_websocket) {
 		os << "connection: " << (_close ? "close" : "keep-alive") << "\r\n";
 	}
@@ -188,22 +188,22 @@ void HttpRequest::initQueryParam() {
 	if(_parserParamFlag & 0x1) {
 		return;
 	}
-#define PARSE_PARAM(str, m, flag, trim)                                                            \
-	size_t pos = 0;                                                                                \
-	do {                                                                                           \
-		size_t last = pos;                                                                         \
-		pos			= str.find('=', pos);                                                          \
-		if(pos == std::string::npos) {                                                             \
-			break;                                                                                 \
-		}                                                                                          \
-		size_t key = pos;                                                                          \
-		pos		   = str.find(flag, pos);                                                          \
-		m.insert(std::make_pair(trim(str.substr(last, key - last)),                                \
-								StringUtil::urlDecode(str.substr(key + 1, pos - key - 1))));       \
-		if(pos == std::string::npos) {                                                             \
-			break;                                                                                 \
-		}                                                                                          \
-		++pos;                                                                                     \
+#define PARSE_PARAM(str, m, flag, trim)                                                      \
+	size_t pos = 0;                                                                          \
+	do {                                                                                     \
+		size_t last = pos;                                                                   \
+		pos			= str.find('=', pos);                                                    \
+		if(pos == std::string::npos) {                                                       \
+			break;                                                                           \
+		}                                                                                    \
+		size_t key = pos;                                                                    \
+		pos		   = str.find(flag, pos);                                                    \
+		m.insert(std::make_pair(trim(str.substr(last, key - last)),                          \
+								StringUtil::urlDecode(str.substr(key + 1, pos - key - 1)))); \
+		if(pos == std::string::npos) {                                                       \
+			break;                                                                           \
+		}                                                                                    \
+		++pos;                                                                               \
 	} while(true);
 
 	PARSE_PARAM(_query, _params, '&', );
@@ -220,22 +220,22 @@ void HttpRequest::initBodyParam() {
 		_parserParamFlag |= 0x2;
 		return;
 	}
-#define PARSE_PARAM(str, m, flag, trim)                                                            \
-	size_t pos = 0;                                                                                \
-	do {                                                                                           \
-		size_t last = pos;                                                                         \
-		pos			= str.find('=', pos);                                                          \
-		if(pos == std::string::npos) {                                                             \
-			break;                                                                                 \
-		}                                                                                          \
-		size_t key = pos;                                                                          \
-		pos		   = str.find(flag, pos);                                                          \
-		m.insert(std::make_pair(trim(str.substr(last, key - last)),                                \
-								StringUtil::urlDecode(str.substr(key + 1, pos - key - 1))));       \
-		if(pos == std::string::npos) {                                                             \
-			break;                                                                                 \
-		}                                                                                          \
-		++pos;                                                                                     \
+#define PARSE_PARAM(str, m, flag, trim)                                                      \
+	size_t pos = 0;                                                                          \
+	do {                                                                                     \
+		size_t last = pos;                                                                   \
+		pos			= str.find('=', pos);                                                    \
+		if(pos == std::string::npos) {                                                       \
+			break;                                                                           \
+		}                                                                                    \
+		size_t key = pos;                                                                    \
+		pos		   = str.find(flag, pos);                                                    \
+		m.insert(std::make_pair(trim(str.substr(last, key - last)),                          \
+								StringUtil::urlDecode(str.substr(key + 1, pos - key - 1)))); \
+		if(pos == std::string::npos) {                                                       \
+			break;                                                                           \
+		}                                                                                    \
+		++pos;                                                                               \
 	} while(true);
 
 	PARSE_PARAM(_body, _params, '&', );
@@ -252,22 +252,22 @@ void HttpRequest::initCookies() {
 		_parserParamFlag |= 0x4;
 		return;
 	}
-#define PARSE_PARAM(str, m, flag, trim)                                                            \
-	size_t pos = 0;                                                                                \
-	do {                                                                                           \
-		size_t last = pos;                                                                         \
-		pos			= str.find('=', pos);                                                          \
-		if(pos == std::string::npos) {                                                             \
-			break;                                                                                 \
-		}                                                                                          \
-		size_t key = pos;                                                                          \
-		pos		   = str.find(flag, pos);                                                          \
-		m.insert(std::make_pair(trim(str.substr(last, key - last)),                                \
-								StringUtil::urlDecode(str.substr(key + 1, pos - key - 1))));       \
-		if(pos == std::string::npos) {                                                             \
-			break;                                                                                 \
-		}                                                                                          \
-		++pos;                                                                                     \
+#define PARSE_PARAM(str, m, flag, trim)                                                      \
+	size_t pos = 0;                                                                          \
+	do {                                                                                     \
+		size_t last = pos;                                                                   \
+		pos			= str.find('=', pos);                                                    \
+		if(pos == std::string::npos) {                                                       \
+			break;                                                                           \
+		}                                                                                    \
+		size_t key = pos;                                                                    \
+		pos		   = str.find(flag, pos);                                                    \
+		m.insert(std::make_pair(trim(str.substr(last, key - last)),                          \
+								StringUtil::urlDecode(str.substr(key + 1, pos - key - 1)))); \
+		if(pos == std::string::npos) {                                                       \
+			break;                                                                           \
+		}                                                                                    \
+		++pos;                                                                               \
 	} while(true);
 
 	PARSE_PARAM(cookie, _cookies, ';', StringUtil::trim);
@@ -325,8 +325,9 @@ std::string HttpResponse::toString() const {
 }
 
 std::ostream& HttpResponse::dump(std::ostream& os) const {
-	os << "HTTP/" << (static_cast<uint32_t>(_version >> 4)) << "." << (static_cast<uint32_t>(_version & 0x0F)) << " "
-	   << static_cast<uint32_t>(_status) << " " << (_reason.empty() ? httpStatusToString(_status) : _reason) << "\r\n";
+	os << "HTTP/" << (static_cast<uint32_t>(_version >> 4)) << "." << (static_cast<uint32_t>(_version & 0x0F))
+	   << " " << static_cast<uint32_t>(_status) << " "
+	   << (_reason.empty() ? httpStatusToString(_status) : _reason) << "\r\n";
 
 	for(auto& item : _headers) {
 		if(!_websocket && strcasecmp(item.first.c_str(), "connection") == 0) {

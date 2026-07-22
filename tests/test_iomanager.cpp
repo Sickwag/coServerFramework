@@ -10,7 +10,7 @@ static azzato::Logger::ptr g_logger = azzato::LoggerMgr::getInstance()->getLogge
 
 void testTimer() {
 	azzato::IOManager iom(1, true, "iomanager");
-	int				 fired = 0;
+	int				  fired = 0;
 	iom.addTimer(500, [&fired]() { ++fired; }, false);
 	iom.addTimer(200, [&fired]() { ++fired; }, false);
 	iom.stop();
@@ -20,10 +20,10 @@ void testTimer() {
 
 void testFdEvent() {
 	azzato::IOManager iom(1, true, "iomanager");
-	int				 sockets[2];
+	int				  sockets[2];
 	assert(::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0);
 
-	int read_hits = 0;
+	int read_hits  = 0;
 	int write_hits = 0;
 	iom.addEvent(sockets[0], azzato::IOManager::Read, [&read_hits]() { ++read_hits; });
 	iom.addEvent(sockets[1], azzato::IOManager::Write, [&sockets, &write_hits]() {

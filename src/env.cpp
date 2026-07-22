@@ -1,6 +1,6 @@
 #include "env.h"
-#include "utils/config.h"
 #include "log.h"
+#include "utils/config.h"
 #include <filesystem>
 #include <iomanip>
 #include <iostream>

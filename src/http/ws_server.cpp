@@ -8,7 +8,7 @@ namespace http {
 
 WSServer::WSServer(IOManager* worker, IOManager* ioWorker, IOManager* acceptWorker)
 	: TcpServer(worker, ioWorker, acceptWorker) {
-	_type	 = "websocket";
+	_type = "websocket";
 	_dispatch.reset(new WSServletDispatch);
 }
 

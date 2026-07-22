@@ -9,14 +9,15 @@ namespace azzato {
 namespace http {
 
 #pragma pack(1)
+
 struct WSFrameHead {
 	enum Opcode {
-		Continue	= 0,
-		TextFrame	= 1,
-		BinFrame	= 2,
-		Close		= 8,
-		Ping		= 0x9,
-		Pong		= 0xA,
+		Continue  = 0,
+		TextFrame = 1,
+		BinFrame  = 2,
+		Close	  = 8,
+		Ping	  = 0x9,
+		Pong	  = 0xA,
 	};
 
 	uint32_t opcode : 4;
@@ -29,6 +30,7 @@ struct WSFrameHead {
 
 	std::string toString() const;
 };
+
 #pragma pack()
 
 class WSFrameMessage {

@@ -31,9 +31,9 @@ class ZlibStream : public Stream {
 	};
 
 	enum CompressLevel {
-		NoCompression	  = Z_NO_COMPRESSION,
-		BestSpeed		  = Z_BEST_SPEED,
-		BestCompression	  = Z_BEST_COMPRESSION,
+		NoCompression	   = Z_NO_COMPRESSION,
+		BestSpeed		   = Z_BEST_SPEED,
+		BestCompression	   = Z_BEST_COMPRESSION,
 		DefaultCompression = Z_DEFAULT_COMPRESSION
 	};
 
@@ -44,12 +44,12 @@ class ZlibStream : public Stream {
 	static ptr createDeflate(bool encode, uint32_t buffSize = 4096);
 
 	static ptr create(bool	   encode,
-					  uint32_t buffSize   = 4096,
-					  Type	   type		   = Deflate,
-					  int	   level	   = DefaultCompression,
+					  uint32_t buffSize	  = 4096,
+					  Type	   type		  = Deflate,
+					  int	   level	  = DefaultCompression,
 					  int	   windowBits = 15,
-					  int	   memLevel	   = 8,
-					  Strategy strategy	   = DefaultStrategy);
+					  int	   memLevel	  = 8,
+					  Strategy strategy	  = DefaultStrategy);
 
 	ZlibStream(bool encode, uint32_t buffSize = 4096);
 
@@ -82,11 +82,11 @@ class ZlibStream : public Stream {
 	ByteArray::ptr getByteArray();
 
   private:
-	int init(Type	  type		  = Deflate,
-			 int	  level		  = DefaultCompression,
+	int init(Type	  type		 = Deflate,
+			 int	  level		 = DefaultCompression,
 			 int	  windowBits = 15,
-			 int	  memLevel	  = 8,
-			 Strategy strategy	  = DefaultStrategy);
+			 int	  memLevel	 = 8,
+			 Strategy strategy	 = DefaultStrategy);
 
 	int encode(const iovec* v, const uint64_t& size, bool finish);
 

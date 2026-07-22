@@ -1,5 +1,5 @@
-#include "tcp_server.h"
 #include "log.h"
+#include "tcp_server.h"
 #include "utils/macro.h"
 
 #include <cassert>
@@ -30,8 +30,8 @@ class EchoServer : public azzato::TcpServer {
 // FdCtx for every socket (making accept/send/recv fiber-friendly).
 void testEchoServer() {
 	azzato::IOManager iom(2, true, "iomanager");
-	EchoServer::ptr	 server(new EchoServer(&iom));
-	bool			 ok = false;
+	EchoServer::ptr	  server(new EchoServer(&iom));
+	bool			  ok = false;
 
 	iom.schedule([&]() {
 		auto addr = azzato::IPv4Address::create("127.0.0.1", 0);

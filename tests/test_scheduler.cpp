@@ -1,5 +1,5 @@
-#include "scheduler.h"
 #include "log.h"
+#include "scheduler.h"
 #include "utils/macro.h"
 
 #include <cassert>
@@ -8,7 +8,7 @@
 
 static azzato::Logger::ptr g_logger = azzato::LoggerMgr::getInstance()->getLogger("system");
 
-static int s_count = 5;
+static int s_count					= 5;
 
 void testFiber() {
 	AZZATO_LOG_INFO(g_logger) << "test in fiber s_count=" << s_count;

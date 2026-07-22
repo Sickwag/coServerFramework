@@ -19,7 +19,7 @@ namespace azzato {
  */
 class IOManager : public Scheduler, public TimerManager {
   public:
-	using ptr		   = std::shared_ptr<IOManager>;
+	using ptr		  = std::shared_ptr<IOManager>;
 	using RWMutexType = RWMutex;
 
 	enum Event : uint32_t {
@@ -79,11 +79,11 @@ class IOManager : public Scheduler, public TimerManager {
 	bool stopping(uint64_t& timeout);
 
   private:
-	int						  _epfd = 0;
-	int						  _tickleFds[2];
-	std::atomic<size_t>		  _pendingEventCount{0};
-	RWMutexType				  _mutex;
-	std::vector<FdContext*>   _fdContexts;
+	int						_epfd = 0;
+	int						_tickleFds[2];
+	std::atomic<size_t>		_pendingEventCount{0};
+	RWMutexType				_mutex;
+	std::vector<FdContext*> _fdContexts;
 };
 
 }  // namespace azzato

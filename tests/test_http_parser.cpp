@@ -8,16 +8,15 @@
 static azzato::Logger::ptr g_logger = azzato::LoggerMgr::getInstance()->getLogger("system");
 
 void testRequest() {
-	const char* raw =
-		"POST /submit?name=azzato HTTP/1.1\r\n"
-		"Host: localhost:8080\r\n"
-		"Content-Type: application/x-www-form-urlencoded\r\n"
-		"Content-Length: 11\r\n"
-		"\r\n"
-		"hello=world";
+	const char* raw = "POST /submit?name=azzato HTTP/1.1\r\n"
+					  "Host: localhost:8080\r\n"
+					  "Content-Type: application/x-www-form-urlencoded\r\n"
+					  "Content-Length: 11\r\n"
+					  "\r\n"
+					  "hello=world";
 
 	azzato::http::HttpRequestParser::ptr parser(new azzato::http::HttpRequestParser);
-	size_t consumed = parser->execute(raw, std::strlen(raw));
+	size_t								 consumed = parser->execute(raw, std::strlen(raw));
 	assert(consumed == std::strlen(raw));
 	assert(parser->isFinished());
 	assert(!parser->hasError());
@@ -36,10 +35,9 @@ void testRequest() {
 
 void testChunkedInput() {
 	// Feed the request in small chunks to exercise the incremental parser.
-	const char* raw =
-		"GET /chunked HTTP/1.1\r\n"
-		"Host: example.com\r\n"
-		"\r\n";
+	const char* raw = "GET /chunked HTTP/1.1\r\n"
+					  "Host: example.com\r\n"
+					  "\r\n";
 
 	azzato::http::HttpRequestParser::ptr parser(new azzato::http::HttpRequestParser);
 	for(size_t i = 0; i < std::strlen(raw); ++i) {
@@ -54,12 +52,11 @@ void testChunkedInput() {
 }
 
 void testResponse() {
-	const char* raw =
-		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/plain\r\n"
-		"Content-Length: 5\r\n"
-		"\r\n"
-		"hello";
+	const char* raw = "HTTP/1.1 200 OK\r\n"
+					  "Content-Type: text/plain\r\n"
+					  "Content-Length: 5\r\n"
+					  "\r\n"
+					  "hello";
 
 	azzato::http::HttpResponseParser::ptr parser(new azzato::http::HttpResponseParser);
 	parser->execute(raw, std::strlen(raw));
@@ -75,7 +72,7 @@ void testResponse() {
 }
 
 void testInvalid() {
-	const char* bad = "NOT A VALID REQUEST\r\n";
+	const char*							 bad = "NOT A VALID REQUEST\r\n";
 	azzato::http::HttpRequestParser::ptr parser(new azzato::http::HttpRequestParser);
 	parser->execute(bad, std::strlen(bad));
 	// A malformed request line leaves an invalid method but should not crash;

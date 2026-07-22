@@ -301,7 +301,7 @@ class ConfigVar : public ConfigVarBase {
 
   private:
 	mutable RWMutexType _mutex;	 // protect `_val` and `_callbacks`
-	T			_val;
+	T					_val;
 
 	/**
 	 * @brief all callbacks in it will be called when `_val` changes

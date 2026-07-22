@@ -12,12 +12,13 @@ void testHttpClient() {
 
 	azzato::http::HttpServer::ptr server(new azzato::http::HttpServer(false, &iom, &iom, &iom));
 	server->setName("azzato_test_server");
-	server->getServletDispatch()->addServlet("/hello", [](azzato::http::HttpRequest::ptr req,
-														 azzato::http::HttpResponse::ptr rsp,
-														 azzato::http::HttpSession::ptr) -> int32_t {
-		rsp->setBody("hello world");
-		return 0;
-	});
+	server->getServletDispatch()->addServlet("/hello",
+											 [](azzato::http::HttpRequest::ptr	req,
+												azzato::http::HttpResponse::ptr rsp,
+												azzato::http::HttpSession::ptr) -> int32_t {
+												 rsp->setBody("hello world");
+												 return 0;
+											 });
 
 	bool ok = false;
 	iom.schedule([&]() {
@@ -28,9 +29,10 @@ void testHttpClient() {
 		auto local = server->getLocalAddress();
 		AZZATO_LOG_INFO(g_logger) << "server on " << local->toString();
 
-		std::string url = "http://" + local->toString() + "/hello";
+		std::string url	   = "http://" + local->toString() + "/hello";
 		auto		result = azzato::http::HttpConnection::doGet(url, 3000);
-		ok = result && result->result == 0 && result->response && result->response->getBody() == "hello world";
+		ok =
+			result && result->result == 0 && result->response && result->response->getBody() == "hello world";
 		AZZATO_LOG_INFO(g_logger) << "client result: " << (ok ? "ok" : "fail");
 		if(!ok && result) {
 			AZZATO_LOG_INFO(g_logger) << result->toString();

@@ -44,12 +44,12 @@ class Timer : public std::enable_shared_from_this<Timer>, private Noncopyable {
 	std::function<void()> getCallback() const { return _callback; }
 
   private:
-	bool				   _recurring = false;
-	uint64_t			   _ms		   = 0;
-	uint64_t			   _next	   = 0;
+	bool				  _recurring = false;
+	uint64_t			  _ms		 = 0;
+	uint64_t			  _next		 = 0;
 	std::function<void()> _callback;
-	TimerManager*		   _manager	= nullptr;
-	bool				   _cancelled = false;
+	TimerManager*		  _manager	 = nullptr;
+	bool				  _cancelled = false;
 };
 
 /**
@@ -70,10 +70,10 @@ class TimerManager : private Noncopyable {
 
 	Timer::ptr addTimer(uint64_t ms, std::function<void()> callback, bool recurring = false);
 
-	Timer::ptr addConditionTimer(uint64_t ms,
+	Timer::ptr addConditionTimer(uint64_t			   ms,
 								 std::function<void()> callback,
-								 std::weak_ptr<void> weakCondition,
-								 bool recurring = false);
+								 std::weak_ptr<void>   weakCondition,
+								 bool				   recurring = false);
 
 	/**
 	 * @return Milliseconds until the earliest timer fires, or ~0ull if none.
@@ -95,10 +95,10 @@ class TimerManager : private Noncopyable {
 	bool detectClockRollover(uint64_t nowMs);
 
   private:
-	RWMutexType			_mutex;
+	RWMutexType								_mutex;
 	std::set<Timer::ptr, Timer::Comparator> _timers;
-	bool				_tickled = false;
-	uint64_t			_previousTime = 0;
+	bool									_tickled	  = false;
+	uint64_t								_previousTime = 0;
 };
 
 }  // namespace azzato

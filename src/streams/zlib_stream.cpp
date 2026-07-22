@@ -52,9 +52,7 @@ ZlibStream::~ZlibStream() {
 	}
 }
 
-int ZlibStream::read(void* buffer, size_t length) {
-	throw std::logic_error("ZlibStream::read is invalid");
-}
+int ZlibStream::read(void* buffer, size_t length) { throw std::logic_error("ZlibStream::read is invalid"); }
 
 int ZlibStream::read(ByteArray::ptr ba, size_t length) {
 	throw std::logic_error("ZlibStream::read is invalid");
@@ -132,9 +130,9 @@ int ZlibStream::encode(const iovec* v, const uint64_t& size, bool finish) {
 			}
 
 			_zstream.avail_out = static_cast<uInt>(_buffSize - ivc->iov_len);
-			_zstream.next_out	= static_cast<Bytef*>(ivc->iov_base) + ivc->iov_len;
+			_zstream.next_out  = static_cast<Bytef*>(ivc->iov_base) + ivc->iov_len;
 
-			ret					= deflate(&_zstream, flush);
+			ret				   = deflate(&_zstream, flush);
 			if(ret == Z_STREAM_ERROR) {
 				return ret;
 			}
@@ -169,9 +167,9 @@ int ZlibStream::decode(const iovec* v, const uint64_t& size, bool finish) {
 			}
 
 			_zstream.avail_out = static_cast<uInt>(_buffSize - ivc->iov_len);
-			_zstream.next_out	= static_cast<Bytef*>(ivc->iov_base) + ivc->iov_len;
+			_zstream.next_out  = static_cast<Bytef*>(ivc->iov_base) + ivc->iov_len;
 
-			ret					= inflate(&_zstream, flush);
+			ret				   = inflate(&_zstream, flush);
 			if(ret == Z_STREAM_ERROR) {
 				return ret;
 			}

@@ -1,6 +1,6 @@
 #include "db/mysql.h"
-#include "utils/config.h"
 #include "log.h"
+#include "utils/config.h"
 #include <string>
 
 namespace azzato {

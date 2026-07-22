@@ -1,5 +1,5 @@
-#include "uri.h"
 #include "log.h"
+#include "uri.h"
 #include "utils/macro.h"
 
 #include <cassert>
@@ -22,7 +22,7 @@ void testUri() {
 void testDefaultPort() {
 	auto uri = azzato::Uri::create("https://example.com/path");
 	assert(uri);
-	assert(uri->getPort() == 443);	 // default https port
+	assert(uri->getPort() == 443);	// default https port
 	AZZATO_LOG_INFO(g_logger) << uri->toString();
 }
 

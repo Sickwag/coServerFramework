@@ -49,12 +49,12 @@ class HttpRequestParser {
 		Done,
 	};
 
-	State			_state = State::RequestLine;
-	std::string		_line;	// partially accumulated current line
+	State			 _state = State::RequestLine;
+	std::string		 _line;	 // partially accumulated current line
 	HttpRequest::ptr _data;
-	uint64_t		_bodyRemaining = 0;
-	bool			_finished	   = false;
-	int				_error		   = 0;
+	uint64_t		 _bodyRemaining = 0;
+	bool			 _finished		= false;
+	int				 _error			= 0;
 };
 
 /**
@@ -95,12 +95,12 @@ class HttpResponseParser {
 		Done,
 	};
 
-	State			 _state = State::StatusLine;
-	std::string		 _line;
+	State			  _state = State::StatusLine;
+	std::string		  _line;
 	HttpResponse::ptr _data;
-	uint64_t		 _bodyRemaining = 0;
-	bool			 _finished		= false;
-	int				 _error			= 0;
+	uint64_t		  _bodyRemaining = 0;
+	bool			  _finished		 = false;
+	int				  _error		 = 0;
 };
 
 }  // namespace http

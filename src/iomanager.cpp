@@ -1,9 +1,9 @@
 #include "iomanager.h"
 #include "utils/macro.h"
 
+#include <cstring>
 #include <errno.h>
 #include <fcntl.h>
-#include <cstring>
 #include <sys/epoll.h>
 #include <unistd.h>
 
@@ -11,7 +11,8 @@ namespace azzato {
 
 namespace {
 
-enum class EpollCtlOp {};
+enum class EpollCtlOp {
+};
 
 std::ostream& operator<<(std::ostream& os, EpollCtlOp op) {
 	switch(static_cast<int>(op)) {
@@ -79,7 +80,7 @@ void IOManager::FdContext::resetContext(EventContext& ctx) {
 
 void IOManager::FdContext::triggerEvent(Event event) {
 	AZZATO_ASSERT(events & event);
-	events		   = static_cast<Event>(events & ~event);
+	events			  = static_cast<Event>(events & ~event);
 	EventContext& ctx = getContext(event);
 	if(ctx.callback) {
 		ctx.scheduler->schedule(ctx.callback);
@@ -102,7 +103,7 @@ IOManager::IOManager(size_t threads, bool useCaller, const std::string& name)
 	event.events  = EPOLLIN | EPOLLET;
 	event.data.fd = _tickleFds[0];
 
-	rt		   = fcntl(_tickleFds[0], F_SETFL, O_NONBLOCK);
+	rt			  = fcntl(_tickleFds[0], F_SETFL, O_NONBLOCK);
 	AZZATO_ASSERT(!rt);
 
 	rt = epoll_ctl(_epfd, EPOLL_CTL_ADD, _tickleFds[0], &event);
@@ -128,7 +129,7 @@ void IOManager::contextResize(size_t size) {
 	_fdContexts.resize(size);
 	for(size_t i = 0; i < _fdContexts.size(); ++i) {
 		if(!_fdContexts[i]) {
-			_fdContexts[i]	  = new FdContext;
+			_fdContexts[i]	   = new FdContext;
 			_fdContexts[i]->fd = static_cast<int>(i);
 		}
 	}
@@ -150,9 +151,9 @@ int IOManager::addEvent(int fd, Event event, std::function<void()> callback) {
 
 	Mutex::Lock lock2(fd_ctx->mutex);
 	if(AZZATO_UNLIKELY(fd_ctx->events & event)) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "addEvent assert fd=" << fd << " event="
-											<< static_cast<EPOLL_EVENTS>(event) << " fd_ctx.event="
-											<< static_cast<EPOLL_EVENTS>(fd_ctx->events);
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "addEvent assert fd=" << fd << " event=" << static_cast<EPOLL_EVENTS>(event)
+			<< " fd_ctx.event=" << static_cast<EPOLL_EVENTS>(fd_ctx->events);
 		AZZATO_ASSERT(!(fd_ctx->events & event));
 	}
 
@@ -161,17 +162,17 @@ int IOManager::addEvent(int fd, Event event, std::function<void()> callback) {
 	epevent.events	 = EPOLLET | fd_ctx->events | event;
 	epevent.data.ptr = fd_ctx;
 
-	int rt = epoll_ctl(_epfd, op, fd, &epevent);
+	int rt			 = epoll_ctl(_epfd, op, fd, &epevent);
 	if(rt) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", "
-											<< fd << ", " << static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt
-											<< " (" << errno << ") (" << std::strerror(errno) << ") fd_ctx->events="
-											<< static_cast<EPOLL_EVENTS>(fd_ctx->events);
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", " << fd << ", "
+			<< static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt << " (" << errno << ") ("
+			<< std::strerror(errno) << ") fd_ctx->events=" << static_cast<EPOLL_EVENTS>(fd_ctx->events);
 		return -1;
 	}
 
 	++_pendingEventCount;
-	fd_ctx->events = static_cast<Event>(fd_ctx->events | event);
+	fd_ctx->events					   = static_cast<Event>(fd_ctx->events | event);
 	FdContext::EventContext& event_ctx = fd_ctx->getContext(event);
 	AZZATO_ASSERT(!event_ctx.scheduler && !event_ctx.fiber && !event_ctx.callback);
 
@@ -205,11 +206,12 @@ bool IOManager::delEvent(int fd, Event event) {
 	epevent.events	 = EPOLLET | new_events;
 	epevent.data.ptr = fd_ctx;
 
-	int rt = epoll_ctl(_epfd, op, fd, &epevent);
+	int rt			 = epoll_ctl(_epfd, op, fd, &epevent);
 	if(rt) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", "
-											<< fd << ", " << static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt
-											<< " (" << errno << ") (" << std::strerror(errno) << ")";
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", " << fd << ", "
+			<< static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt << " (" << errno << ") ("
+			<< std::strerror(errno) << ")";
 		return false;
 	}
 
@@ -238,11 +240,12 @@ bool IOManager::cancelEvent(int fd, Event event) {
 	epevent.events	 = EPOLLET | new_events;
 	epevent.data.ptr = fd_ctx;
 
-	int rt = epoll_ctl(_epfd, op, fd, &epevent);
+	int rt			 = epoll_ctl(_epfd, op, fd, &epevent);
 	if(rt) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", "
-											<< fd << ", " << static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt
-											<< " (" << errno << ") (" << std::strerror(errno) << ")";
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", " << fd << ", "
+			<< static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt << " (" << errno << ") ("
+			<< std::strerror(errno) << ")";
 		return false;
 	}
 
@@ -269,11 +272,12 @@ bool IOManager::cancelAll(int fd) {
 	epevent.events	 = 0;
 	epevent.data.ptr = fd_ctx;
 
-	int rt = epoll_ctl(_epfd, op, fd, &epevent);
+	int rt			 = epoll_ctl(_epfd, op, fd, &epevent);
 	if(rt) {
-		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", "
-											<< fd << ", " << static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt
-											<< " (" << errno << ") (" << std::strerror(errno) << ")";
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+			<< "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", " << fd << ", "
+			<< static_cast<EPOLL_EVENTS>(epevent.events) << "):" << rt << " (" << errno << ") ("
+			<< std::strerror(errno) << ")";
 		return false;
 	}
 
@@ -312,8 +316,8 @@ bool IOManager::stopping() {
 
 void IOManager::idle() {
 	AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "idle";
-	constexpr uint64_t	  MAX_EVENTS = 256;
-	auto				  events	  = std::make_unique<epoll_event[]>(MAX_EVENTS);
+	constexpr uint64_t MAX_EVENTS = 256;
+	auto			   events	  = std::make_unique<epoll_event[]>(MAX_EVENTS);
 
 	while(true) {
 		uint64_t next_timeout = 0;
@@ -377,12 +381,12 @@ void IOManager::idle() {
 			int op			= left_events ? EPOLL_CTL_MOD : EPOLL_CTL_DEL;
 			event.events	= EPOLLET | left_events;
 
-			int rt2 = epoll_ctl(_epfd, op, fd_ctx->fd, &event);
+			int rt2			= epoll_ctl(_epfd, op, fd_ctx->fd, &event);
 			if(rt2) {
 				AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
-					<< "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", " << fd_ctx->fd << ", "
-					<< static_cast<EPOLL_EVENTS>(event.events) << "):" << rt2 << " (" << errno << ") ("
-					<< std::strerror(errno) << ")";
+					<< "epoll_ctl(" << _epfd << ", " << static_cast<EpollCtlOp>(op) << ", " << fd_ctx->fd
+					<< ", " << static_cast<EPOLL_EVENTS>(event.events) << "):" << rt2 << " (" << errno
+					<< ") (" << std::strerror(errno) << ")";
 				continue;
 			}
 

@@ -10,7 +10,7 @@ class FoxThread;
 
 class IFoxThread {
   public:
-	using ptr = std::shared_ptr<IFoxThread>;
+	using ptr	   = std::shared_ptr<IFoxThread>;
 	using callback = std::function<void()>;
 	virtual ~IFoxThread(){};
 	virtual bool	 dispatch(callback cb)							 = 0;

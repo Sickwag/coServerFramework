@@ -23,7 +23,8 @@ class Servlet {
 
 	virtual ~Servlet() = default;
 
-	virtual int32_t handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) = 0;
+	virtual int32_t
+	handle(HttpRequest::ptr request, HttpResponse::ptr response, HttpSession::ptr session) = 0;
 
 	const std::string& getName() const { return _name; }
 
@@ -46,11 +47,11 @@ class FunctionServlet : public Servlet {
 
 class IServletCreator {
   public:
-	using ptr = std::shared_ptr<IServletCreator>;
+	using ptr							= std::shared_ptr<IServletCreator>;
 
-	virtual ~IServletCreator() = default;
+	virtual ~IServletCreator()			= default;
 
-	virtual Servlet::ptr get() const = 0;
+	virtual Servlet::ptr get() const	= 0;
 
 	virtual std::string getName() const = 0;
 };
@@ -82,7 +83,7 @@ class ServletCreator : public IServletCreator {
 
 class ServletDispatch : public Servlet {
   public:
-	using ptr		   = std::shared_ptr<ServletDispatch>;
+	using ptr		  = std::shared_ptr<ServletDispatch>;
 	using RWMutexType = RWMutex;
 
 	ServletDispatch();
@@ -130,10 +131,10 @@ class ServletDispatch : public Servlet {
 	void listAllGlobServletCreator(std::map<std::string, IServletCreator::ptr>& infos);
 
   private:
-	RWMutexType												 _mutex;
-	std::unordered_map<std::string, IServletCreator::ptr>	 _datas;
+	RWMutexType												  _mutex;
+	std::unordered_map<std::string, IServletCreator::ptr>	  _datas;
 	std::vector<std::pair<std::string, IServletCreator::ptr>> _globs;
-	Servlet::ptr											 _defaultServlet;
+	Servlet::ptr											  _defaultServlet;
 };
 
 class NotFoundServlet : public Servlet {

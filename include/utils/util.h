@@ -174,7 +174,7 @@ bool writeToStream(std::ostream& os, const T& v) {
 	return (bool)os;
 }
 
-bool readFixFromStreamWithSpeed(std::istream&  is,
+bool readFixFromStreamWithSpeed(std::istream&	is,
 								char*			data,
 								const uint64_t& size,
 								const uint64_t& speed = -1);

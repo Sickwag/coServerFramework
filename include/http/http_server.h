@@ -11,8 +11,8 @@ class HttpServer : public TcpServer {
   public:
 	using ptr = std::shared_ptr<HttpServer>;
 
-	HttpServer(bool keepalive		   = false,
-			   IOManager* worker		   = IOManager::getThis(),
+	HttpServer(bool		  keepalive	   = false,
+			   IOManager* worker	   = IOManager::getThis(),
 			   IOManager* ioWorker	   = IOManager::getThis(),
 			   IOManager* acceptWorker = IOManager::getThis());
 
@@ -26,7 +26,7 @@ class HttpServer : public TcpServer {
 	void handleClient(Socket::ptr client) override;
 
   private:
-	bool			   _isKeepalive;
+	bool				 _isKeepalive;
 	ServletDispatch::ptr _dispatch;
 };
 

@@ -11,8 +11,8 @@ class WSServer : public TcpServer {
   public:
 	using ptr = std::shared_ptr<WSServer>;
 
-	WSServer(IOManager* worker		  = IOManager::getThis(),
-			 IOManager* ioWorker	  = IOManager::getThis(),
+	WSServer(IOManager* worker		 = IOManager::getThis(),
+			 IOManager* ioWorker	 = IOManager::getThis(),
 			 IOManager* acceptWorker = IOManager::getThis());
 
 	WSServletDispatch::ptr getWSServletDispatch() const { return _dispatch; }

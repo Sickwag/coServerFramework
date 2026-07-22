@@ -1,7 +1,7 @@
 #include "db/sqlite3.h"
-#include "utils/config.h"
 #include "env.h"
 #include "log.h"
+#include "utils/config.h"
 
 namespace azzato {
 
