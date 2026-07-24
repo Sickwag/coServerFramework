@@ -116,7 +116,7 @@ class MySQLStmtResultSet : public ISQLData {
 	time_t		getTime(int idx) override;
 	bool		next() override;
 
-  private:
+  public:
 	MySQLStmtResultSet(std::shared_ptr<MySQLStmt> stmt, int eno, const std::string& estr);
 
 	struct Data {
@@ -230,7 +230,7 @@ class MySQLTransaction : public ITransaction {
 
 	bool isError() const { return _hasError; }
 
-  private:
+  public:
 	MySQLTransaction(MySQL::ptr mysql, bool autoCommit);
 
   private:
@@ -290,7 +290,7 @@ class MySQLStmt : public IStmt, public std::enable_shared_from_this<MySQLStmt> {
 
 	MYSQL_STMT* getRaw() const { return _stmt; }
 
-  private:
+  public:
 	MySQLStmt(MySQL::ptr db, MYSQL_STMT* stmt);
 
   private:

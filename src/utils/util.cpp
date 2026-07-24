@@ -1,4 +1,5 @@
 #include "utils/util.h"
+#include "fiber.h"
 #include "utils/json_util.h"
 #include <algorithm>
 #include <arpa/inet.h>
@@ -252,10 +253,7 @@ namespace fs = std::filesystem;
 
 pid_t getThreadId() { return syscall(SYS_gettid); }
 
-uint32_t getFiberId() {
-	// TODO: get fiber id to return
-	return 0;
-}
+uint32_t getFiberId() { return static_cast<uint32_t>(Fiber::getFiberIdOfThis()); }
 
 std::string getHostName() {
 	// std::shared_ptr<char> host(new char[512], azzato::deleteArray<char>);

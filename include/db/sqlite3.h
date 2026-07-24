@@ -70,7 +70,7 @@ class SQLite3 : public IDB, public std::enable_shared_from_this<SQLite3> {
 
 	sqlite3* getDB() const { return _db; }
 
-  private:
+  public:
 	SQLite3(sqlite3* db);
 
   private:
@@ -186,7 +186,7 @@ class SQLite3Stmt : public IStmt, public std::enable_shared_from_this<SQLite3Stm
 	int			getErrno() override;
 	std::string getErrStr() override;
 
-  protected:
+  public:
 	SQLite3Stmt(SQLite3::ptr db);
 
   protected:

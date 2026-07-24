@@ -14,14 +14,14 @@ SQLite3::SQLite3(sqlite3* db)
 SQLite3::~SQLite3() { close(); }
 
 SQLite3::ptr SQLite3::Create(sqlite3* db) {
-	SQLite3::ptr rt(new SQLite3(db));
+	SQLite3::ptr rt = std::make_shared<SQLite3>(db);
 	return rt;
 }
 
 SQLite3::ptr SQLite3::Create(const std::string& dbname, int flags) {
 	sqlite3* db;
 	if(sqlite3_open_v2(dbname.c_str(), &db, flags, nullptr) == SQLITE_OK) {
-		return SQLite3::ptr(new SQLite3(db));
+		return std::make_shared<SQLite3>(db);
 	}
 	return nullptr;
 }
@@ -66,7 +66,7 @@ int SQLite3::execute(const std::string& sql) { return sqlite3_exec(_db, sql.c_st
 int64_t SQLite3::getLastInsertId() { return sqlite3_last_insert_rowid(_db); }
 
 SQLite3Stmt::ptr SQLite3Stmt::Create(SQLite3::ptr db, const char* stmt) {
-	SQLite3Stmt::ptr rt(new SQLite3Stmt(db));
+	SQLite3Stmt::ptr rt = std::make_shared<SQLite3Stmt>(db);
 	if(rt->prepare(stmt) != SQLITE_OK) {
 		return nullptr;
 	}
@@ -211,7 +211,7 @@ SQLite3Stmt::SQLite3Stmt(SQLite3::ptr db)
 
 SQLite3Stmt::~SQLite3Stmt() { finish(); }
 
-ISQLData::ptr SQLite3Stmt::query() { return SQLite3Data::ptr(new SQLite3Data(shared_from_this(), 0, "")); }
+ISQLData::ptr SQLite3Stmt::query() { return std::make_shared<SQLite3Data>(shared_from_this(), 0, ""); }
 
 int SQLite3Stmt::execute() {
 	int rt = step();

@@ -41,6 +41,7 @@ find_library(HIREDIS_VIP_LIB hiredis_vip PATHS ${HIREDIS_VIP_DIR} NO_DEFAULT_PAT
 # =============================================================================
 file(GLOB_RECURSE AZZATO_SRC CONFIGURE_DEPENDS "src/*.cpp" "src/*.c")
 list(FILTER AZZATO_SRC EXCLUDE REGEX "src/main\\.cpp$")
+list(FILTER AZZATO_SRC EXCLUDE REGEX "src/orm/orm\\.cpp$")
 
 # Protobuf generation for ns/ns_protobuf.proto
 set(AZZATO_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
@@ -96,6 +97,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 add_executable(azzatoBackend main.cpp)
 target_link_libraries(azzatoBackend PRIVATE azzato)
+
+add_executable(orm src/orm/orm.cpp)
+target_link_libraries(orm PRIVATE azzato)
 
 # =============================================================================
 # Examples
