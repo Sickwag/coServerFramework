@@ -79,21 +79,13 @@ bool RoaringBitmap::operator==(const RoaringBitmap& b) const {
 
 bool RoaringBitmap::operator!=(const RoaringBitmap& b) const { return !(*this == b); }
 
-RoaringBitmap RoaringBitmap::operator&(const RoaringBitmap& b) {
-	return RoaringBitmap(_bitmap & b._bitmap);
-}
+RoaringBitmap RoaringBitmap::operator&(const RoaringBitmap& b) { return RoaringBitmap(_bitmap & b._bitmap); }
 
-RoaringBitmap RoaringBitmap::operator|(const RoaringBitmap& b) {
-	return RoaringBitmap(_bitmap | b._bitmap);
-}
+RoaringBitmap RoaringBitmap::operator|(const RoaringBitmap& b) { return RoaringBitmap(_bitmap | b._bitmap); }
 
-RoaringBitmap RoaringBitmap::operator-(const RoaringBitmap& b) {
-	return RoaringBitmap(_bitmap - b._bitmap);
-}
+RoaringBitmap RoaringBitmap::operator-(const RoaringBitmap& b) { return RoaringBitmap(_bitmap - b._bitmap); }
 
-RoaringBitmap RoaringBitmap::operator^(const RoaringBitmap& b) {
-	return RoaringBitmap(_bitmap ^ b._bitmap);
-}
+RoaringBitmap RoaringBitmap::operator^(const RoaringBitmap& b) { return RoaringBitmap(_bitmap ^ b._bitmap); }
 
 std::string RoaringBitmap::toString() const {
 	std::stringstream ss;

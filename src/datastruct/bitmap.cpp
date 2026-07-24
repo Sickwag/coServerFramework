@@ -46,9 +46,9 @@ Bitmap::Bitmap()
 
 Bitmap::Bitmap(const Bitmap& b) {
 	_compress = b._compress;
-	_size	   = b._size;
+	_size	  = b._size;
 	_dataSize = b._dataSize;
-	_data	   = (base_type*)malloc(_dataSize * sizeof(base_type));
+	_data	  = (base_type*)malloc(_dataSize * sizeof(base_type));
 	memcpy(_data, b._data, _dataSize * sizeof(base_type));
 }
 
@@ -68,7 +68,7 @@ void Bitmap::writeTo(azzato::ByteArray::ptr ba) const {
 bool Bitmap::readFrom(azzato::ByteArray::ptr ba) {
 	try {
 		_compress = ba->read<uint8_t>();
-		_size	   = ba->read<uint32_t>();
+		_size	  = ba->read<uint32_t>();
 		_dataSize = ba->read<uint32_t>();
 		if(_data) {
 			free(_data);
@@ -86,7 +86,7 @@ Bitmap& Bitmap::operator=(const Bitmap& b) {
 		return *this;
 	}
 	_compress = b._compress;
-	_size	   = b._size;
+	_size	  = b._size;
 	_dataSize = b._dataSize;
 	if(_data) {
 		free(_data);
@@ -122,8 +122,7 @@ Bitmap& Bitmap::operator&=(const Bitmap& b) {
 				uint32_t tmp_i = i;
 				for(uint32_t n = i + 1; n < b._dataSize; ++n) {
 					if((b._data[n] & COMPRESS_MASK) && (v == (bool)(b._data[n] & VALUE_MASK))) {
-						count =
-							(((uint32_t)(b._data[n] & COUNT_MASK)) << (VALUE_SIZE * (n - tmp_i))) | count;
+						count = (((uint32_t)(b._data[n] & COUNT_MASK)) << (VALUE_SIZE * (n - tmp_i))) | count;
 						++i;
 					} else {
 						break;
@@ -200,8 +199,7 @@ Bitmap& Bitmap::operator|=(const Bitmap& b) {
 				uint32_t tmp_i = i;
 				for(uint32_t n = i + 1; n < b._dataSize; ++n) {
 					if((b._data[n] & COMPRESS_MASK) && (v == (bool)(b._data[n] & VALUE_MASK))) {
-						count =
-							(((uint32_t)(b._data[n] & COUNT_MASK)) << (VALUE_SIZE * (n - tmp_i))) | count;
+						count = (((uint32_t)(b._data[n] & COUNT_MASK)) << (VALUE_SIZE * (n - tmp_i))) | count;
 						++i;
 					} else {
 						break;
@@ -375,9 +373,9 @@ Bitmap::ptr Bitmap::compress() const {
 
 	Bitmap::ptr b(new Bitmap);
 	b->_compress = true;
-	b->_size	  = _size;
+	b->_size	 = _size;
 	b->_dataSize = dst_cur_pos;
-	b->_data	  = (base_type*)malloc(dst_cur_pos * sizeof(base_type));
+	b->_data	 = (base_type*)malloc(dst_cur_pos * sizeof(base_type));
 	memcpy(b->_data, data, dst_cur_pos * sizeof(base_type));
 	free(data);
 	return b;
@@ -407,7 +405,7 @@ Bitmap::ptr Bitmap::uncompress() const {
 			cur_pos += count;
 			++i;
 		} else {
-			base_type count					= cur & COUNT_MASK;
+			base_type count				   = cur & COUNT_MASK;
 			b->_data[cur_pos / VALUE_SIZE] = count;
 			cur_pos += VALUE_SIZE;
 			++i;
@@ -427,7 +425,7 @@ bool Bitmap::any() const {
 			}
 		}
 		return _data[_dataSize - 1]
-			   & MASK[_size % VALUE_SIZE];	 //(((base_type)1 << (_size % VALUE_SIZE)) - 1);
+			   & MASK[_size % VALUE_SIZE];	//(((base_type)1 << (_size % VALUE_SIZE)) - 1);
 	} else {
 		for(uint32_t i = 0; i < _dataSize; ++i) {
 			uint8_t cur = _data[i];
@@ -466,12 +464,12 @@ void Bitmap::resize(uint32_t size, bool v) {
 
 		uint32_t left = _size % VALUE_SIZE;
 		if(v) {
-			new_data[_dataSize - 1] |= MASK[left];	 //((base_type)1 << left) - 1;
+			new_data[_dataSize - 1] |= MASK[left];	//((base_type)1 << left) - 1;
 		} else {
-			new_data[_dataSize - 1] &= MASK[left];	 //((base_type)1 << left) - 1;
+			new_data[_dataSize - 1] &= MASK[left];	//((base_type)1 << left) - 1;
 		}
 	}
-	_size	   = size;
+	_size	  = size;
 	_dataSize = len;
 }
 
@@ -711,10 +709,10 @@ bool Bitmap::iterator_base::operator!() {
 int32_t Bitmap::iterator_base::operator*() { return _pos; }
 
 Bitmap::iterator::iterator(Bitmap* b) {
-	_pos	   = -1;
-	_size	   = b->_size;
+	_pos	  = -1;
+	_size	  = b->_size;
 	_dataSize = b->_dataSize;
-	_data	   = b->_data;
+	_data	  = b->_data;
 	_compress = b->_compress;
 
 	next();
@@ -749,10 +747,10 @@ void Bitmap::iterator::next() {
 }
 
 Bitmap::iterator_reverse::iterator_reverse(Bitmap* b) {
-	_pos	   = b->_size;
-	_size	   = b->_size;
+	_pos	  = b->_size;
+	_size	  = b->_size;
 	_dataSize = b->_dataSize;
-	_data	   = b->_data;
+	_data	  = b->_data;
 	_compress = b->_compress;
 
 	next();

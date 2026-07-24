@@ -1,10 +1,10 @@
 #include "datastruct/bitmap.h"
 #include "datastruct/cache_status.h"
-#include "datastruct/roaring_bitmap.h"
 #include "datastruct/dict.h"
 #include "datastruct/hash_map.h"
 #include "datastruct/hash_multimap.h"
 #include "datastruct/lru_cache.h"
+#include "datastruct/roaring_bitmap.h"
 #include "datastruct/timed_cache.h"
 #include "datastruct/timed_lru_cache.h"
 #include "datastruct/util.h"
@@ -46,7 +46,7 @@ void testLru() {
 		cache.set(i, i * 10);
 	}
 	int v = 0;
-	assert(cache.get(0, v) == false);	// evicted (capacity 10)
+	assert(cache.get(0, v) == false);  // evicted (capacity 10)
 	assert(cache.get(19, v));
 	assert(v == 190);
 	AZZATO_LOG_INFO(g_logger) << "LruCache ok";

@@ -4,7 +4,12 @@
 #ifndef ROARING_INCLUDE_ROARING_VERSION
 #	define ROARING_INCLUDE_ROARING_VERSION
 #	define ROARING_VERSION = 0.2.65,
-enum { ROARING_VERSION_MAJOR = 0, ROARING_VERSION_MINOR = 2, ROARING_VERSION_REVISION = 65 };
+
+enum {
+	ROARING_VERSION_MAJOR	 = 0,
+	ROARING_VERSION_MINOR	 = 2,
+	ROARING_VERSION_REVISION = 65
+};
 #endif	// ROARING_INCLUDE_ROARING_VERSION
 /* end file include/roaring/roaring_version.h */
 /* begin file include/roaring/portability.h */
@@ -265,15 +270,21 @@ During lazy computations, we can transform array containers into bitset
 containers as
 long as we can expect them to have  ARRAY_LAZY_LOWERBOUND values.
 */
-enum { ARRAY_LAZY_LOWERBOUND = 1024 };
+enum {
+	ARRAY_LAZY_LOWERBOUND = 1024
+};
 
 /* default initial size of a run container
    setting it to zero delays the malloc.*/
-enum { RUN_DEFAULT_INIT_SIZE = 0 };
+enum {
+	RUN_DEFAULT_INIT_SIZE = 0
+};
 
 /* default initial size of an array container
    setting it to zero delays the malloc */
-enum { ARRAY_DEFAULT_INIT_SIZE = 0 };
+enum {
+	ARRAY_DEFAULT_INIT_SIZE = 0
+};
 
 /* automatic bitset conversion during lazy or */
 #	ifndef LAZY_OR_BITSET_CONVERSION
@@ -1214,7 +1225,9 @@ AVXPOPCNTFNC(andnot, _mm256_andnot_si256)
 #	include <string.h>
 
 /* Containers with DEFAULT_MAX_SIZE or less integers should be arrays */
-enum { DEFAULT_MAX_SIZE = 4096 };
+enum {
+	DEFAULT_MAX_SIZE = 4096
+};
 
 /* struct array_container - sparse representation of a bitmap
  *
@@ -1651,7 +1664,10 @@ static inline void array_container_remove_range(array_container_t* array, uint32
 #		define ALIGN_AVX
 #	endif
 
-enum { BITSET_CONTAINER_SIZE_IN_WORDS = (1 << 16) / 64, BITSET_UNKNOWN_CARDINALITY = -1 };
+enum {
+	BITSET_CONTAINER_SIZE_IN_WORDS = (1 << 16) / 64,
+	BITSET_UNKNOWN_CARDINALITY	   = -1
+};
 
 struct bitset_container_s {
 	int32_t	  cardinality;
@@ -2043,6 +2059,7 @@ int32_t bitset_container_write(const bitset_container_t* container, char* buf);
  * You need to provide the (known) cardinality.
  */
 int32_t bitset_container_read(int32_t cardinality, bitset_container_t* container, const char* buf);
+
 /**
  * Return the serialized size in bytes of a container (see
  * bitset_container_write).
@@ -3597,8 +3614,8 @@ static inline void* get_writable_copy_if_shared(void* candidate_shared_container
  * End of shared container code
  */
 
-static const char* container_names[]		= { "bitset", "array", "run", "shared" };
-static const char* shared_container_names[] = { "bitset (shared)", "array (shared)", "run (shared)" };
+static const char* container_names[]		= {"bitset", "array", "run", "shared"};
+static const char* shared_container_names[] = {"bitset (shared)", "array (shared)", "run (shared)"};
 
 // no matter what the initial container was, convert it to a bitset
 // if a new container is produced, caller responsible for freeing the previous
@@ -5874,7 +5891,7 @@ static inline void cpuinfo(int code, int* eax, int* ebx, int* ecx, int* edx) {
 					   "=c"(*ecx),
 					   "=d"(*edx)  // output equal to "movl  %%eax %1"
 					 : "a"(code)   // input equal to "movl %1, %%eax"
-					 //:"%eax","%ebx","%ecx","%edx"// clobbered register
+								   //:"%eax","%ebx","%ecx","%edx"// clobbered register
 	);
 #		endif /* not sure what to do when inline assembly is unavailable*/
 }
@@ -6071,6 +6088,7 @@ roaring_bitmap_t* roaring_bitmap_of_ptr(size_t n_args, const uint32_t* vals);
 inline bool roaring_bitmap_get_copy_on_write(const roaring_bitmap_t* r) {
 	return r->high_low_container.flags & ROARING_FLAG_COW;
 }
+
 inline void roaring_bitmap_set_copy_on_write(roaring_bitmap_t* r, bool cow) {
 	if(cow) {
 		r->high_low_container.flags |= ROARING_FLAG_COW;

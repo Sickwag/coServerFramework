@@ -80,9 +80,7 @@ class Murmur3Hash<uint64_t, seed> {
 template <uint32_t seed>
 class Murmur3Hash<std::string, seed> {
   public:
-	uint32_t operator()(const std::string& data) {
-		return murmur3_hash(data.data(), data.size(), seed);
-	}
+	uint32_t operator()(const std::string& data) { return murmur3_hash(data.data(), data.size(), seed); }
 };
 
 template <typename T, uint32_t seed>

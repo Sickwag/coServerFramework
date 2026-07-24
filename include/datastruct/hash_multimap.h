@@ -19,7 +19,7 @@ class HashMultimap {
 	HashMultimap(const uint32_t& size = 10)
 		: _total(0)
 		, _elements(0) {
-		_size	= basket(size);
+		_size  = basket(size);
 		_datas = new std::vector<Node>[_size]();
 	}
 
@@ -51,7 +51,7 @@ class HashMultimap {
 
 	SharedArray<V> get(const K& k, bool duplicate = true) {
 		uint32_t				   hashvalue = _posHash(k);
-		azzato::RWMutex::ReadLock   lock(_mutex);
+		azzato::RWMutex::ReadLock  lock(_mutex);
 		uint32_t				   pos = hashvalue % _size;
 		typename RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
 		auto					   it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
@@ -69,7 +69,7 @@ class HashMultimap {
 
 	bool get(const K& k, std::vector<V>& v) {
 		uint32_t				   hashvalue = _posHash(k);
-		azzato::RWMutex::ReadLock   lock(_mutex);
+		azzato::RWMutex::ReadLock  lock(_mutex);
 		uint32_t				   pos = hashvalue % _size;
 		typename RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
 		auto					   it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
@@ -83,7 +83,7 @@ class HashMultimap {
 
 	bool get(const K& k, V& v) {
 		uint32_t				   hashvalue = _posHash(k);
-		azzato::RWMutex::ReadLock   lock(_mutex);
+		azzato::RWMutex::ReadLock  lock(_mutex);
 		uint32_t				   pos = hashvalue % _size;
 		typename RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
 		auto					   it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
@@ -101,7 +101,7 @@ class HashMultimap {
 
 	bool exists(const K& k) {
 		uint32_t				   hashvalue = _posHash(k);
-		azzato::RWMutex::ReadLock   lock(_mutex);
+		azzato::RWMutex::ReadLock  lock(_mutex);
 		uint32_t				   pos = hashvalue % _size;
 		typename RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
 		auto					   it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
@@ -110,7 +110,7 @@ class HashMultimap {
 
 	bool exists(const K& k, const V& v) {
 		uint32_t				   hashvalue = _posHash(k);
-		azzato::RWMutex::ReadLock   lock(_mutex);
+		azzato::RWMutex::ReadLock  lock(_mutex);
 		uint32_t				   pos = hashvalue % _size;
 		typename RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
 		auto					   it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
@@ -335,6 +335,7 @@ class HashMultimap {
 	}
 
 	uint64_t getTotal() const { return _total; }
+
 	uint64_t getElements() const { return _elements; }
 
 	std::ostream& dump(std::ostream& os) {
@@ -425,10 +426,10 @@ class HashMultimap {
 						break;
 					}
 				}
-				_total	   = size / sizeof(Node);
+				_total	  = size / sizeof(Node);
 
 				_elements = 0;
-				_datas	   = new std::vector<Node>[_size]();
+				_datas	  = new std::vector<Node>[_size]();
 				for(auto& n : ns) {
 					n.val = &vs[0] + (uint64_t)n.val;
 					_datas[_posHash(n.key) % _size].push_back(n);
@@ -477,7 +478,7 @@ class HashMultimap {
 		delete[] _datas;
 		// freeDatas(_datas, _size);
 
-		_size	= size;
+		_size  = size;
 		_datas = datas;
 	}
 
@@ -520,7 +521,7 @@ class HashMultimap {
 
 	std::vector<V> _values;
 
-	static const uint32_t MAX_MUTEX = 1024 * 128;
+	static const uint32_t  MAX_MUTEX = 1024 * 128;
 	static azzato::RWMutex s_mutex[MAX_MUTEX];
 };
 
@@ -528,4 +529,3 @@ template <class K, class V, class PosHash>
 azzato::RWMutex HashMultimap<K, V, PosHash>::s_mutex[MAX_MUTEX];
 
 }  // namespace azzato
-

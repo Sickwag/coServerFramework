@@ -990,19 +990,19 @@ FoxRedisCluster::Ctx::~Ctx() {
 void FoxRedisCluster::Ctx::cancelEvent() {
 	// AZZATO_LOG_INFO(systemLogger) << "cancelEvent " << FoxThread::GetThis()
 	//            << " - " << thread
-	//            << " - " << IOManager::GetThis()
+	//            << " - " << IOManager::getThis()
 	//            << " - " << cancel_count;
 	// if(thread != FoxThread::GetThis()) {
 	//     AZZATO_LOG_INFO(systemLogger) << "cancelEvent " << FoxThread::GetThis()
 	//                << " - " << thread
-	//                << " - " << IOManager::GetThis()
+	//                << " - " << IOManager::getThis()
 	//                << " - " << cancel_count;
 
 	//    //AZZATO_LOG_INFO(systemLogger) << "cancelEvent thread=" << thread << " " << thread->getId()
 	//    //           << " this=" << FoxThread::GetThis();
 	//    //AZZATO_ASSERT(thread == FoxThread::GetThis());
 	//}
-	// AZZATO_ASSERT(!IOManager::GetThis());
+	// AZZATO_ASSERT(!IOManager::getThis());
 	////if(Atomic::addFetch(cancel_count) > 1) {
 	////    return;
 	////}

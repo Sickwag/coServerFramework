@@ -11,6 +11,7 @@
 namespace azzato {
 
 class StringDict;
+
 template <class K, class V, class PosHash = azzato::Murmur3Hash<K>>
 class Dict {
 	friend class StringDict;
@@ -21,18 +22,18 @@ class Dict {
 
 	Dict(const uint32_t& size = 0)
 		: _total(0) {
-		_size	= basket(size);
+		_size  = basket(size);
 		_datas = new std::vector<Node>[_size]();
 	}
 
 	~Dict() { freeDatas(_datas, _size); }
 
 	SharedArray<V> get(const K& k, bool duplicate = true) {
-		uint32_t				 hashvalue = _posHash(k);
+		uint32_t				  hashvalue = _posHash(k);
 		azzato::RWMutex::ReadLock lock(_mutex);
-		uint32_t				 pos = hashvalue % _size;
+		uint32_t				  pos = hashvalue % _size;
 		azzato::RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
-		auto					 it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
+		auto					  it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
 		// AZZATO_ASSERT(it == std::find(_datas[pos].begin(), _datas[pos].end(), Node(k)));
 		if(it == _datas[pos].end()) {
 			return SharedArray<V>();
@@ -47,11 +48,11 @@ class Dict {
 	}
 
 	bool get(const K& k, std::vector<V>& v) {
-		uint32_t				 hashvalue = _posHash(k);
+		uint32_t				  hashvalue = _posHash(k);
 		azzato::RWMutex::ReadLock lock(_mutex);
-		uint32_t				 pos = hashvalue % _size;
+		uint32_t				  pos = hashvalue % _size;
 		azzato::RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
-		auto					 it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
+		auto					  it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
 		// AZZATO_ASSERT(it == std::find(_datas[pos].begin(), _datas[pos].end(), Node(k)));
 		if(it == _datas[pos].end()) {
 			return false;
@@ -62,11 +63,11 @@ class Dict {
 	}
 
 	bool exists(const K& k) {
-		uint32_t				 hashvalue = _posHash(k);
+		uint32_t				  hashvalue = _posHash(k);
 		azzato::RWMutex::ReadLock lock(_mutex);
-		uint32_t				 pos = hashvalue % _size;
+		uint32_t				  pos = hashvalue % _size;
 		azzato::RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
-		auto					 it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
+		auto					  it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
 		// AZZATO_ASSERT(it == std::find(_datas[pos].begin(), _datas[pos].end(), Node(k)));
 		return it != _datas[pos].end();
 	}
@@ -80,9 +81,9 @@ class Dict {
 			rehash();
 		}
 
-		uint32_t				  hashvalue = _posHash(k);
+		uint32_t				   hashvalue = _posHash(k);
 		azzato::RWMutex::ReadLock  lock(_mutex);
-		uint32_t				  pos = hashvalue % _size;
+		uint32_t				   pos = hashvalue % _size;
 		azzato::RWMutex::WriteLock lock2(s_mutex[pos % MAX_MUTEX]);
 
 		auto it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
@@ -129,9 +130,9 @@ class Dict {
 	uint64_t getTotal() const { return _total; }
 
 	bool del(const K& k) {
-		uint32_t				  hashvalue = _posHash(k);
+		uint32_t				   hashvalue = _posHash(k);
 		azzato::RWMutex::ReadLock  lock(_mutex);
-		uint32_t				  pos = hashvalue % _size;
+		uint32_t				   pos = hashvalue % _size;
 		azzato::RWMutex::WriteLock lock2(s_mutex[pos % MAX_MUTEX]);
 
 		auto it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
@@ -271,11 +272,11 @@ class Dict {
 
   private:
 	std::string getString(const K& k) {
-		uint32_t				 hashvalue = _posHash(k);
+		uint32_t				  hashvalue = _posHash(k);
 		azzato::RWMutex::ReadLock lock(_mutex);
-		uint32_t				 pos = hashvalue % _size;
+		uint32_t				  pos = hashvalue % _size;
 		azzato::RWMutex::ReadLock lock2(s_mutex[pos % MAX_MUTEX]);
-		auto					 it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
+		auto					  it = binarySearch(_datas[pos].begin(), _datas[pos].end(), Node(k));
 		// AZZATO_ASSERT(it == std::find(_datas[pos].begin(), _datas[pos].end(), Node(k)));
 		if(it == _datas[pos].end()) {
 			return std::string();
@@ -317,7 +318,7 @@ class Dict {
 		delete[] _datas;
 		// freeDatas(_datas, _size);
 
-		_size	= size;
+		_size  = size;
 		_datas = datas;
 	}
 
@@ -359,7 +360,7 @@ class Dict {
 
 	std::vector<V> _values;
 
-	static const uint32_t MAX_MUTEX = 1024 * 128;
+	static const uint32_t  MAX_MUTEX = 1024 * 128;
 	static azzato::RWMutex s_mutex[MAX_MUTEX];
 };
 
@@ -374,18 +375,21 @@ class StringDict {
 		}
 		return azzato::murmur3_hash64(str.c_str(), str.size(), 1060627423, 1050126127);
 	}
+
 	static uint64_t GetID(const char* str, const uint32_t& size) {
 		if(size == 0) {
 			return 0;
 		}
 		return azzato::murmur3_hash64(str, size, 1060627423, 1050126127);
 	}
+
 	static uint64_t GetID(const char* str) {
 		if(str == nullptr) {
 			return 0;
 		}
 		return azzato::murmur3_hash64(str, 1060627423, 1050126127);
 	}
+
 	uint64_t update(const std::string& str) { return update(str.c_str(), str.size()); }
 
 	uint64_t update(const char* str, const uint32_t& size) {
@@ -416,9 +420,7 @@ class StringDict {
 
 	std::ostream& dump(std::ostream& os) { return _dict.dump(os); }
 
-	void foreach(std::function<bool(const uint64_t& k, const char* v, size_t size)> cb) {
-		_dict.foreach(cb);
-	}
+	void foreach(std::function<bool(const uint64_t& k, const char* v, size_t size)> cb) { _dict.foreach(cb); }
 
 	uint64_t getTotal() { return _dict.getTotal(); }
 
@@ -427,4 +429,3 @@ class StringDict {
 };
 
 }  // namespace azzato
-

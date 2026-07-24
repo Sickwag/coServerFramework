@@ -69,9 +69,11 @@ class RoaringBitmap {
 	typedef RoaringSetBitReverseIterator reverse_iterator;
 
 	iterator begin() const { return _bitmap.begin(); }
+
 	iterator end() const { return _bitmap.end(); }
 
 	reverse_iterator rbegin() const { return _bitmap.rbegin(); }
+
 	reverse_iterator rend() const { return _bitmap.rend(); }
 
   private:
@@ -82,4 +84,3 @@ class RoaringBitmap {
 };
 
 }  // namespace azzato
-

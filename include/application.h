@@ -2,6 +2,7 @@
 
 #include "http/http_server.h"
 #include "iomanager.h"
+#include "streams/service_discovery.h"
 #include "tcp_server.h"
 #include <map>
 #include <memory>
@@ -26,6 +27,8 @@ class Application {
 	bool run();
 
 	bool getServer(const std::string& type, std::vector<TcpServer::ptr>& servers);
+
+	IServiceDiscovery::ptr getServiceDiscovery() const { return nullptr; }
 
 	void listAllServer(std::map<std::string, std::vector<TcpServer::ptr>>& servers);
 

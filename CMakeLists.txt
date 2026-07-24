@@ -22,6 +22,8 @@ find_package(jsoncpp CONFIG REQUIRED)
 find_package(Libevent CONFIG REQUIRED)
 find_package(Protobuf CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
+find_package(unofficial-zookeeper CONFIG REQUIRED)
+find_package(tinyxml2 CONFIG REQUIRED)
 
 # MySQL: system package
 find_path(MYSQL_INCLUDE_DIR mysql.h PATHS /usr/include/mysql /usr/local/include/mysql NO_DEFAULT_PATH)
@@ -40,10 +42,25 @@ find_library(HIREDIS_VIP_LIB hiredis_vip PATHS ${HIREDIS_VIP_DIR} NO_DEFAULT_PAT
 file(GLOB_RECURSE AZZATO_SRC CONFIGURE_DEPENDS "src/*.cpp" "src/*.c")
 list(FILTER AZZATO_SRC EXCLUDE REGEX "src/main\\.cpp$")
 
-add_library(azzato STATIC ${AZZATO_SRC})
+# Protobuf generation for ns/ns_protobuf.proto
+set(AZZATO_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
+find_package(Protobuf CONFIG REQUIRED)
+set(NS_PROTO ${CMAKE_CURRENT_SOURCE_DIR}/src/ns/ns_protobuf.proto)
+add_custom_command(
+	OUTPUT ${AZZATO_GENERATED_DIR}/ns/ns_protobuf.pb.cc ${AZZATO_GENERATED_DIR}/ns/ns_protobuf.pb.h
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${AZZATO_GENERATED_DIR}
+	COMMAND protobuf::protoc --cpp_out=${AZZATO_GENERATED_DIR} -I ${CMAKE_CURRENT_SOURCE_DIR}/src ${NS_PROTO}
+	DEPENDS ${NS_PROTO}
+	VERBATIM
+)
+add_custom_target(generate_proto DEPENDS ${AZZATO_GENERATED_DIR}/ns/ns_protobuf.pb.cc)
+
+add_library(azzato STATIC ${AZZATO_SRC} ${AZZATO_GENERATED_DIR}/ns/ns_protobuf.pb.cc)
+add_dependencies(azzato generate_proto)
 target_include_directories(azzato
 	PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
+	${AZZATO_GENERATED_DIR}
 	PRIVATE
 	${MYSQL_INCLUDE_DIR}
 	${HIREDIS_VIP_DIR}
@@ -64,6 +81,9 @@ target_link_libraries(azzato
 	OpenSSL::Crypto
 	ZLIB::ZLIB
 	unofficial::sqlite3::sqlite3
+	unofficial::zookeeper::zookeeper
+	unofficial::zookeeper::hashtable
+	tinyxml2::tinyxml2
 	${HIREDIS_VIP_LIB}
 	${MYSQL_LIBRARY}
 )

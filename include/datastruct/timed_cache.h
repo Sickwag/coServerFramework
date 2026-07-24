@@ -16,6 +16,7 @@ class TimedCache {
 			: key(k)
 			, val(v)
 			, ts(t) {}
+
 		K		  key;
 		mutable V val;
 		uint64_t  ts;
@@ -40,7 +41,7 @@ class TimedCache {
 		, _elasticity(elasticity)
 		, _status(status) {
 		if(_status == nullptr) {
-			_status	  = new CacheStatus;
+			_status		 = new CacheStatus;
 			_statusOwner = true;
 		}
 	}
@@ -142,10 +143,13 @@ class TimedCache {
 	}
 
 	void setMaxSize(const size_t& v) { _maxSize = v; }
+
 	void setElasticity(const size_t& v) { _elasticity = v; }
 
 	size_t getMaxSize() const { return _maxSize; }
+
 	size_t getElasticity() const { return _elasticity; }
+
 	size_t getMaxAllowedSize() const { return _maxSize + _elasticity; }
 
 	template <class F>
@@ -168,11 +172,11 @@ class TimedCache {
 		if(_statusOwner && _status) {
 			delete _status;
 		}
-		_status	  = v;
+		_status		 = v;
 		_statusOwner = owner;
 
 		if(_status == nullptr) {
-			_status	  = new CacheStatus;
+			_status		 = new CacheStatus;
 			_statusOwner = true;
 		}
 	}
@@ -238,7 +242,7 @@ class HashTimedCache {
 		size_t pre_max_size	   = std::ceil(max_size * 1.0 / bucket);
 		size_t pre_elasiticity = std::ceil(elasticity * 1.0 / bucket);
 		_maxSize			   = pre_max_size * bucket;
-		_elasticity		   = pre_elasiticity * bucket;
+		_elasticity			   = pre_elasiticity * bucket;
 
 		for(size_t i = 0; i < bucket; ++i) {
 			_datas[i] = new cache_type(pre_max_size, pre_elasiticity, &_status);
@@ -287,8 +291,11 @@ class HashTimedCache {
 	}
 
 	size_t getMaxSize() const { return _maxSize; }
+
 	size_t getElasticity() const { return _elasticity; }
+
 	size_t getMaxAllowedSize() const { return _maxSize + _elasticity; }
+
 	size_t getBucket() const { return _bucket; }
 
 	void setMaxSize(const size_t& v) {
@@ -301,7 +308,7 @@ class HashTimedCache {
 
 	void setElasticity(const size_t& v) {
 		size_t pre_elasiticity = std::ceil(v * 1.0 / _bucket);
-		_elasticity		   = pre_elasiticity * _bucket;
+		_elasticity			   = pre_elasiticity * _bucket;
 		for(auto& i : _datas) {
 			i->setElasticity(pre_elasiticity);
 		}
@@ -346,4 +353,3 @@ class HashTimedCache {
 };
 
 }  // namespace azzato
-

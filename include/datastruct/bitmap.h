@@ -61,8 +61,10 @@ class Bitmap {
 	bool any() const;
 
 	uint32_t getSize() const { return _size; }
+
 	uint32_t getDataSize() const { return _dataSize; }
-	bool	 isCompress() const { return _compress; }
+
+	bool isCompress() const { return _compress; }
 
 	void resize(uint32_t size, bool v = false);
 
@@ -89,6 +91,7 @@ class Bitmap {
 		typedef std::shared_ptr<iterator_base> ptr;
 
 		iterator_base();
+
 		virtual ~iterator_base() {}
 
 		bool		 operator!();
@@ -106,6 +109,7 @@ class Bitmap {
 	class iterator : public iterator_base {
 	  public:
 		iterator() {}
+
 		iterator(Bitmap* b);
 		void next();
 	};
@@ -113,12 +117,14 @@ class Bitmap {
 	class iterator_reverse : public iterator_base {
 	  public:
 		iterator_reverse() {}
+
 		iterator_reverse(Bitmap* b);
 		void next();
 	};
 
   public:
-	iterator		 begin() { return iterator(this); }
+	iterator begin() { return iterator(this); }
+
 	iterator_reverse rbegin() { return iterator_reverse(this); }
 
 	typename iterator_base::ptr begin_new();
@@ -154,4 +160,3 @@ class Bitmap {
 };
 
 }  // namespace azzato
-
