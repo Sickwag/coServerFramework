@@ -1,4 +1,5 @@
 #include "uri.h"
+#include "address.h"
 #include "utils/util.h"
 
 #include <cstdlib>
@@ -7,6 +8,17 @@
 namespace azzato {
 
 Uri::Uri() {}
+
+Address::ptr Uri::createAddress() const {
+	if(_host.empty()) {
+		return nullptr;
+	}
+	IPAddress::ptr addr = Address::lookupAnyIPAddress(_host);
+	if(addr) {
+		addr->setPort(static_cast<uint16_t>(getPort()));
+	}
+	return addr;
+}
 
 int32_t Uri::getPort() const {
 	if(_port) {
