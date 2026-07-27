@@ -6,9 +6,25 @@
 namespace azzato {
 namespace http {
 
-FunctionWSServlet::FunctionWSServlet(callback cb, const std::string& name)
-	: WSServlet(name)
-	, _cb(std::move(cb)) {}
+FunctionWSServlet::FunctionWSServlet(callback cb, onConnectCb connectCb, onCloseCb closeCb)
+	: WSServlet("FunctionWSServlet")
+	, _cb(std::move(cb))
+	, _connectCb(std::move(connectCb))
+	, _closeCb(std::move(closeCb)) {}
+
+int32_t FunctionWSServlet::onConnect(HttpRequest::ptr header, WSSession::ptr session) {
+	if(_connectCb) {
+		return _connectCb(std::move(header), std::move(session));
+	}
+	return 0;
+}
+
+int32_t FunctionWSServlet::onClose(HttpRequest::ptr header, WSSession::ptr session) {
+	if(_closeCb) {
+		return _closeCb(std::move(header), std::move(session));
+	}
+	return 0;
+}
 
 int32_t FunctionWSServlet::handle(HttpRequest::ptr request, WSFrameMessage::ptr msg, WSSession::ptr session) {
 	return _cb(request, std::move(msg), std::move(session));
@@ -16,8 +32,7 @@ int32_t FunctionWSServlet::handle(HttpRequest::ptr request, WSFrameMessage::ptr 
 
 WSServletDispatch::WSServletDispatch()
 	: _defaultServlet(std::make_shared<FunctionWSServlet>(
-		  [](HttpRequest::ptr, WSFrameMessage::ptr, WSSession::ptr) -> int32_t { return 0; },
-		  "default")) {}
+		  [](HttpRequest::ptr, WSFrameMessage::ptr, WSSession::ptr) -> int32_t { return 0; })) {}
 
 int32_t WSServletDispatch::handle(HttpRequest::ptr request, WSFrameMessage::ptr msg, WSSession::ptr session) {
 	auto servlet = getMatchedWSServlet(request->getPath());
@@ -32,9 +47,13 @@ void WSServletDispatch::addServlet(const std::string& uri, WSServlet::ptr servle
 	_datas[uri] = servlet;
 }
 
-void WSServletDispatch::addServlet(const std::string& uri, FunctionWSServlet::callback cb) {
+void WSServletDispatch::addServlet(const std::string&			  uri,
+								   FunctionWSServlet::callback	  cb,
+								   FunctionWSServlet::onConnectCb connectCb,
+								   FunctionWSServlet::onCloseCb	  closeCb) {
 	RWMutexType::WriteLock lock(_mutex);
-	_datas[uri] = std::make_shared<FunctionWSServlet>(std::move(cb));
+	_datas[uri] =
+		std::make_shared<FunctionWSServlet>(std::move(cb), std::move(connectCb), std::move(closeCb));
 }
 
 void WSServletDispatch::addGlobServlet(const std::string& uri, WSServlet::ptr servlet) {
@@ -48,8 +67,12 @@ void WSServletDispatch::addGlobServlet(const std::string& uri, WSServlet::ptr se
 	_globs.push_back(std::make_pair(uri, servlet));
 }
 
-void WSServletDispatch::addGlobServlet(const std::string& uri, FunctionWSServlet::callback cb) {
-	addGlobServlet(uri, std::make_shared<FunctionWSServlet>(std::move(cb)));
+void WSServletDispatch::addGlobServlet(const std::string&			  uri,
+									   FunctionWSServlet::callback	  cb,
+									   FunctionWSServlet::onConnectCb connectCb,
+									   FunctionWSServlet::onCloseCb	  closeCb) {
+	addGlobServlet(
+		uri, std::make_shared<FunctionWSServlet>(std::move(cb), std::move(connectCb), std::move(closeCb)));
 }
 
 void WSServletDispatch::delServlet(const std::string& uri) {

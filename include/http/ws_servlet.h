@@ -23,6 +23,10 @@ class WSServlet {
 
 	virtual int32_t handle(HttpRequest::ptr request, WSFrameMessage::ptr msg, WSSession::ptr session) = 0;
 
+	virtual int32_t onConnect(HttpRequest::ptr header, WSSession::ptr session) { return 0; }
+
+	virtual int32_t onClose(HttpRequest::ptr header, WSSession::ptr session) { return 0; }
+
 	const std::string& getName() const { return _name; }
 
   protected:
@@ -31,15 +35,23 @@ class WSServlet {
 
 class FunctionWSServlet : public WSServlet {
   public:
-	using ptr	   = std::shared_ptr<FunctionWSServlet>;
-	using callback = std::function<int32_t(HttpRequest::ptr, WSFrameMessage::ptr, WSSession::ptr)>;
+	using ptr		  = std::shared_ptr<FunctionWSServlet>;
+	using callback	  = std::function<int32_t(HttpRequest::ptr, WSFrameMessage::ptr, WSSession::ptr)>;
+	using onConnectCb = std::function<int32_t(HttpRequest::ptr, WSSession::ptr)>;
+	using onCloseCb	  = std::function<int32_t(HttpRequest::ptr, WSSession::ptr)>;
 
-	FunctionWSServlet(callback cb, const std::string& name = "FunctionWSServlet");
+	FunctionWSServlet(callback cb, onConnectCb connectCb = nullptr, onCloseCb closeCb = nullptr);
 
 	int32_t handle(HttpRequest::ptr request, WSFrameMessage::ptr msg, WSSession::ptr session) override;
 
+	int32_t onConnect(HttpRequest::ptr header, WSSession::ptr session) override;
+
+	int32_t onClose(HttpRequest::ptr header, WSSession::ptr session) override;
+
   private:
-	callback _cb;
+	callback	_cb;
+	onConnectCb _connectCb;
+	onCloseCb	_closeCb;
 };
 
 class WSServletDispatch {
@@ -53,11 +65,17 @@ class WSServletDispatch {
 
 	void addServlet(const std::string& uri, WSServlet::ptr servlet);
 
-	void addServlet(const std::string& uri, FunctionWSServlet::callback cb);
+	void addServlet(const std::string&			   uri,
+					FunctionWSServlet::callback	   cb,
+					FunctionWSServlet::onConnectCb connectCb = nullptr,
+					FunctionWSServlet::onCloseCb   closeCb	 = nullptr);
 
 	void addGlobServlet(const std::string& uri, WSServlet::ptr servlet);
 
-	void addGlobServlet(const std::string& uri, FunctionWSServlet::callback cb);
+	void addGlobServlet(const std::string&			   uri,
+						FunctionWSServlet::callback	   cb,
+						FunctionWSServlet::onConnectCb connectCb = nullptr,
+						FunctionWSServlet::onCloseCb   closeCb	 = nullptr);
 
 	void delServlet(const std::string& uri);
 

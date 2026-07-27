@@ -15,9 +15,20 @@ WSServer::WSServer(IOManager* worker, IOManager* ioWorker, IOManager* acceptWork
 void WSServer::handleClient(Socket::ptr client) {
 	AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "handleClient " << *client;
 	WSSession::ptr session(new WSSession(client));
-	auto		   req = session->handleShake();
-	if(!req) {
+	auto		   header = session->handleShake();
+	if(!header) {
 		AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "handleShake failed";
+		return;
+	}
+	WSServlet::ptr servlet = _dispatch->getMatchedWSServlet(header->getPath());
+	if(!servlet) {
+		AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "no matched WSServlet";
+		session->close();
+		return;
+	}
+	if(servlet->onConnect(header, session)) {
+		AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "onConnect return fail";
+		session->close();
 		return;
 	}
 	while(true) {
@@ -26,8 +37,9 @@ void WSServer::handleClient(Socket::ptr client) {
 			AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << "recvMessage failed";
 			break;
 		}
-		_dispatch->handle(req, msg, session);
+		servlet->handle(header, msg, session);
 	}
+	servlet->onClose(header, session);
 	session->close();
 }
 
