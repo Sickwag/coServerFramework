@@ -2,6 +2,7 @@
 
 #include "http/http_server.h"
 #include "iomanager.h"
+#include "rock/rock_stream.h"
 #include "streams/service_discovery.h"
 #include "tcp_server.h"
 #include <map>
@@ -13,7 +14,7 @@ namespace azzato {
 
 /**
  * @brief Server application entry point: parses args, loads YAML config,
- *        starts the configured TCP/HTTP/WebSocket servers and runs the
+ *        starts the configured TCP/HTTP/WebSocket/Rock servers and runs the
  *        main event loop until interrupted.
  */
 class Application {
@@ -26,9 +27,13 @@ class Application {
 
 	bool run();
 
+	int main(int argc, char** argv);
+
 	bool getServer(const std::string& type, std::vector<TcpServer::ptr>& servers);
 
-	IServiceDiscovery::ptr getServiceDiscovery() const { return nullptr; }
+	IServiceDiscovery::ptr getServiceDiscovery() const { return _serviceDiscovery; }
+
+	RockSDLoadBalance::ptr getRockSDLoadBalance() const { return _rockSDLoadBalance; }
 
 	void listAllServer(std::map<std::string, std::vector<TcpServer::ptr>>& servers);
 
@@ -42,6 +47,8 @@ class Application {
 	char**											   _argv = nullptr;
 	std::map<std::string, std::vector<TcpServer::ptr>> _servers;
 	IOManager::ptr									   _mainIOManager;
+	IServiceDiscovery::ptr							   _serviceDiscovery;
+	RockSDLoadBalance::ptr							   _rockSDLoadBalance;
 	static Application*								   s_instance;
 };
 

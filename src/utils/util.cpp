@@ -522,31 +522,9 @@ void FSUtil::listAllFile(std::vector<std::string>& files,
 }
 
 bool FSUtil::mkdir(const std::string& dirname) {
-	////////// Maintenance implementation
-	// if(__lstat(dirname.c_str()) == 0) {
-	// 	return true;
-	// }
-	// char* path = strdup(dirname.c_str());
-	// char* ptr  = strchr(path + 1, '/');
-	// do {
-	// 	for(; ptr; *ptr = '/', ptr = strchr(ptr + 1, '/')) {
-	// 		*ptr = '\0';
-	// 		if(__mkdir(path) != 0) {
-	// 			break;
-	// 		}
-	// 	}
-	// 	if(ptr != nullptr) {
-	// 		break;
-	// 	} else if(__mkdir(path) != 0) {
-	// 		break;
-	// 	}
-	// 	free(path);
-	// 	return true;
-	// } while(0);
-	// free(path);
-	// return false;
-	////////// Maintenance implementation
-	return fs::create_directories(dirname);
+	std::error_code ec;
+	fs::create_directories(dirname, ec);
+	return !ec;
 }
 
 bool FSUtil::isRunningPidfile(const std::string& pidfile) {

@@ -1,19 +1,34 @@
 #include "application.h"
-#include "env.h"
-#include "http/ws_server.h"
-#include "utils/config.h"
-#include "utils/macro.h"
 
 #include <signal.h>
 #include <unistd.h>
 
+#include "daemon.h"
+#include "db/fox_thread.h"
+#include "db/redis.h"
+#include "env.h"
+#include "http/ws_server.h"
+#include "module.h"
+#include "ns/name_server_module.h"
+#include "rock/rock_server.h"
+#include "utils/config.h"
+#include "utils/macro.h"
+#include "utils/util.h"
+#include "worker.h"
+
 namespace azzato {
 
 namespace {
-ConfigVar<std::string>::ptr g_serverWorkPath =
+ConfigVar<std::string>::ptr gServerWorkPath =
 	Config::lookup("server.work_path", std::string("/apps/work/azzato"), "server work path");
 
-ConfigVar<std::vector<TcpServerConf>>::ptr g_serversConf =
+ConfigVar<std::string>::ptr gServerPidFile =
+	Config::lookup("server.pid_file", std::string("azzato.pid"), "server pid file");
+
+ConfigVar<std::string>::ptr gServiceDiscoveryZk =
+	Config::lookup("service_discovery.zk", std::string(""), "service discovery zookeeper");
+
+ConfigVar<std::vector<TcpServerConf>>::ptr gServersConf =
 	Config::lookup("servers", std::vector<TcpServerConf>(), "server config");
 }  // namespace
 
@@ -34,6 +49,7 @@ bool Application::init(int argc, char** argv) {
 	if(!EnvMgr::getInstance()->init(argc, argv)) {
 		isPrintHelp = true;
 	}
+
 	if(EnvMgr::getInstance()->has("p")) {
 		isPrintHelp = true;
 	}
@@ -42,72 +58,250 @@ bool Application::init(int argc, char** argv) {
 	AZZATO_LOG_INFO(AZZATO_LOG_ROOT()) << "load conf path:" << confPath;
 	Config::loadFromConfigDir(confPath);
 
+	ModuleMgr::getInstance()->init();
+	std::vector<Module::ptr> modules;
+	ModuleMgr::getInstance()->listAll(modules);
+
+	for(auto i : modules) {
+		i->onBeforeArgsParse(argc, argv);
+	}
+
 	if(isPrintHelp) {
 		EnvMgr::getInstance()->printHelp();
 		return false;
 	}
 
-	if(!EnvMgr::getInstance()->has("s") && !EnvMgr::getInstance()->has("d")) {
+	for(auto i : modules) {
+		i->onAfterArgsParse(argc, argv);
+	}
+	modules.clear();
+
+	int runType = 0;
+	if(EnvMgr::getInstance()->has("s")) {
+		runType = 1;
+	}
+	if(EnvMgr::getInstance()->has("d")) {
+		runType = 2;
+	}
+
+	if(runType == 0) {
 		EnvMgr::getInstance()->printHelp();
+		return false;
+	}
+
+	std::string pidfile = gServerWorkPath->getValue() + "/" + gServerPidFile->getValue();
+	if(FSUtil::isRunningPidfile(pidfile)) {
+		AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "server is running:" << pidfile;
+		return false;
+	}
+
+	if(!FSUtil::mkdir(gServerWorkPath->getValue())) {
+		AZZATO_LOG_FATAL(AZZATO_LOG_ROOT()) << "create work path [" << gServerWorkPath->getValue()
+											<< " errno=" << errno << " errstr=" << strerror(errno);
 		return false;
 	}
 	return true;
 }
 
 bool Application::run() {
-	_mainIOManager.reset(new IOManager(2, true, "main"));
-	_mainIOManager->schedule([this]() { runFiber(); });
+	bool isDaemon = EnvMgr::getInstance()->has("d");
+	return start_daemon(_argc,
+						_argv,
+						std::bind(&Application::main, this, std::placeholders::_1, std::placeholders::_2),
+						isDaemon);
+}
+
+int Application::main(int argc, char** argv) {
+	signal(SIGPIPE, SIG_IGN);
+	AZZATO_LOG_INFO(AZZATO_LOG_ROOT()) << "main";
+	std::string confPath = EnvMgr::getInstance()->getConfigPath();
+	Config::loadFromConfigDir(confPath, true);
+	{
+		std::string	  pidfile = gServerWorkPath->getValue() + "/" + gServerPidFile->getValue();
+		std::ofstream ofs(pidfile);
+		if(!ofs) {
+			AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "open pidfile " << pidfile << " failed";
+			return false;
+		}
+		ofs << getpid();
+	}
+
+	_mainIOManager.reset(new IOManager(1, true, "main"));
+	_mainIOManager->schedule(std::bind(&Application::runFiber, this));
 	_mainIOManager->stop();
-	return true;
+	return 0;
 }
 
 int Application::runFiber() {
-	std::vector<TcpServerConf> confs = g_serversConf->getValue();
-	for(auto& conf : confs) {
-		if(!conf.isValid()) {
-			continue;
+	std::vector<Module::ptr> modules;
+	ModuleMgr::getInstance()->listAll(modules);
+	bool hasError = false;
+	for(auto& i : modules) {
+		if(!i->onLoad()) {
+			AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+				<< "module name=" << i->getName() << " version=" << i->getVersion()
+				<< " filename=" << i->getFilename();
+			hasError = true;
 		}
-		if(conf.type == "http") {
-			http::HttpServer::ptr server(new http::HttpServer(
-				conf.keepalive == 1, _mainIOManager.get(), _mainIOManager.get(), _mainIOManager.get()));
-			server->setName(conf.name.empty() ? "azzato_http" : conf.name);
-			std::vector<Address::ptr> addrs, fails;
-			for(auto& addrStr : conf.address) {
-				auto addr = Address::lookupAny(addrStr);
-				if(addr) {
-					addrs.push_back(addr);
+	}
+	if(hasError) {
+		_exit(0);
+	}
+
+	WorkerMgr::getInstance()->init();
+	FoxThreadMgr::getInstance()->init();
+	FoxThreadMgr::getInstance()->start();
+	RedisMgr::getInstance();
+
+	auto						httpConfs = gServersConf->getValue();
+	std::vector<TcpServer::ptr> svrs;
+	for(auto& i : httpConfs) {
+		AZZATO_LOG_DEBUG(AZZATO_LOG_ROOT()) << std::endl << LexicalCast<TcpServerConf, std::string>()(i);
+
+		std::vector<Address::ptr> address;
+		for(auto& a : i.address) {
+			size_t pos = a.find(":");
+			if(pos == std::string::npos) {
+				address.push_back(std::make_shared<UnixAddress>(a));
+				continue;
+			}
+			int32_t port = atoi(a.substr(pos + 1).c_str());
+			auto	addr = IPAddress::create(a.substr(0, pos).c_str(), static_cast<uint16_t>(port));
+			if(addr) {
+				address.push_back(addr);
+				continue;
+			}
+			std::vector<std::pair<Address::ptr, uint32_t>> result;
+			if(Address::getInterfaceAddresses(result, a.substr(0, pos))) {
+				for(auto& x : result) {
+					auto ipaddr = std::dynamic_pointer_cast<IPAddress>(x.first);
+					if(ipaddr) {
+						ipaddr->setPort(static_cast<uint16_t>(atoi(a.substr(pos + 1).c_str())));
+					}
+					address.push_back(ipaddr);
+				}
+				continue;
+			}
+
+			auto aaddr = Address::lookupAny(a);
+			if(aaddr) {
+				address.push_back(aaddr);
+				continue;
+			}
+			AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "invalid address: " << a;
+			_exit(0);
+		}
+		IOManager* acceptWorker	 = IOManager::getThis();
+		IOManager* ioWorker		 = IOManager::getThis();
+		IOManager* processWorker = IOManager::getThis();
+		if(!i.acceptWorker.empty()) {
+			acceptWorker = WorkerMgr::getInstance()->getAsIOManager(i.acceptWorker).get();
+			if(!acceptWorker) {
+				AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "accept_worker: " << i.acceptWorker << " not exists";
+				_exit(0);
+			}
+		}
+		if(!i.ioWorker.empty()) {
+			ioWorker = WorkerMgr::getInstance()->getAsIOManager(i.ioWorker).get();
+			if(!ioWorker) {
+				AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "io_worker: " << i.ioWorker << " not exists";
+				_exit(0);
+			}
+		}
+		if(!i.processWorker.empty()) {
+			processWorker = WorkerMgr::getInstance()->getAsIOManager(i.processWorker).get();
+			if(!processWorker) {
+				AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "process_worker: " << i.processWorker << " not exists";
+				_exit(0);
+			}
+		}
+
+		TcpServer::ptr server;
+		if(i.type == "http") {
+			server.reset(new http::HttpServer(i.keepalive == 1, processWorker, ioWorker, acceptWorker));
+		} else if(i.type == "ws") {
+			server.reset(new http::WSServer(processWorker, ioWorker, acceptWorker));
+		} else if(i.type == "rock") {
+			server.reset(new RockServer("rock", processWorker, ioWorker, acceptWorker));
+		} else if(i.type == "nameserver") {
+			server.reset(new RockServer("nameserver", processWorker, ioWorker, acceptWorker));
+			ModuleMgr::getInstance()->add(std::make_shared<ns::NameServerModule>());
+		} else {
+			AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+				<< "invalid server type=" << i.type << LexicalCast<TcpServerConf, std::string>()(i);
+			_exit(0);
+		}
+		if(!i.name.empty()) {
+			server->setName(i.name);
+		}
+		std::vector<Address::ptr> fails;
+		if(!server->bind(address, fails, i.ssl == 1)) {
+			for(auto& x : fails) {
+				AZZATO_LOG_ERROR(AZZATO_LOG_ROOT()) << "bind address fail:" << *x;
+			}
+			_exit(0);
+		}
+		if(i.ssl == 1) {
+			if(!server->loadCertificates(i.certFile, i.keyFile)) {
+				AZZATO_LOG_ERROR(AZZATO_LOG_ROOT())
+					<< "loadCertificates fail, cert_file=" << i.certFile << " key_file=" << i.keyFile;
+			}
+		}
+		server->setConf(i);
+		_servers[i.type].push_back(server);
+		svrs.push_back(server);
+	}
+
+	if(!gServiceDiscoveryZk->getValue().empty()) {
+		ZKServiceDiscovery::ptr zksd(new ZKServiceDiscovery(gServiceDiscoveryZk->getValue()));
+		_serviceDiscovery = zksd;
+		_rockSDLoadBalance.reset(new RockSDLoadBalance(_serviceDiscovery));
+
+		std::vector<TcpServer::ptr> httpServers;
+		if(!getServer("http", httpServers)) {
+			zksd->setSelfInfo(getIPv4() + ":0:" + getHostName());
+		} else {
+			std::string ipAndPort;
+			for(auto& i : httpServers) {
+				auto socks = i->getSocks();
+				for(auto& s : socks) {
+					auto addr = std::dynamic_pointer_cast<IPv4Address>(s->getLocalAddress());
+					if(!addr) {
+						continue;
+					}
+					auto str = addr->toString();
+					if(str.find("127.0.0.1") == 0) {
+						continue;
+					}
+					if(str.find("0.0.0.0") == 0) {
+						ipAndPort = getIPv4() + ":" + std::to_string(addr->getPort());
+						break;
+					} else {
+						ipAndPort = addr->toString();
+					}
+				}
+				if(!ipAndPort.empty()) {
+					break;
 				}
 			}
-			if(server->bind(addrs, fails, conf.ssl == 1)) {
-				registerServer("http", server);
-				server->start();
-				AZZATO_LOG_INFO(AZZATO_LOG_ROOT()) << "http server started";
-			}
-		} else if(conf.type == "websocket" || conf.type == "ws") {
-			http::WSServer::ptr server(
-				new http::WSServer(_mainIOManager.get(), _mainIOManager.get(), _mainIOManager.get()));
-			server->setName(conf.name.empty() ? "azzato_ws" : conf.name);
-			std::vector<Address::ptr> addrs, fails;
-			for(auto& addrStr : conf.address) {
-				auto addr = Address::lookupAny(addrStr);
-				if(addr) {
-					addrs.push_back(addr);
-				}
-			}
-			if(server->bind(addrs, fails, conf.ssl == 1)) {
-				registerServer("websocket", server);
-				server->start();
-				AZZATO_LOG_INFO(AZZATO_LOG_ROOT()) << "websocket server started";
-			}
+			zksd->setSelfInfo(ipAndPort + ":" + getHostName());
 		}
 	}
 
-	AZZATO_LOG_INFO(AZZATO_LOG_ROOT()) << "application running, press Ctrl-C to stop";
-	while(true) {
-		::sleep(1);
-		if(EnvMgr::getInstance()->has("d")) {
-			// daemon mode: keep running
-		}
+	for(auto& i : modules) {
+		i->onServerReady();
+	}
+
+	for(auto& i : svrs) {
+		i->start();
+	}
+
+	if(_rockSDLoadBalance) {
+		_rockSDLoadBalance->start();
+	}
+
+	for(auto& i : modules) {
+		i->onServerUp();
 	}
 	return 0;
 }

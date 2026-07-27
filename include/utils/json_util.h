@@ -11,7 +11,7 @@ class JsonUtil {
 	static bool		   needEscape(const std::string& v);
 	static std::string escape(const std::string& v);
 	static std::string
-	etString(const Json::Value& json, const std::string& name, const std::string& default_value = "");
+	getString(const Json::Value& json, const std::string& name, const std::string& default_value = "");
 	static double	getDouble(const Json::Value& json, const std::string& name, double default_value = 0);
 	static int32_t	getInt32(const Json::Value& json, const std::string& name, int32_t default_value = 0);
 	static uint32_t getUint32(const Json::Value& json, const std::string& name, uint32_t default_value = 0);

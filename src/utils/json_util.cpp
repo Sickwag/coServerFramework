@@ -77,7 +77,7 @@ std::string JsonUtil::escape(const std::string& v) {
 }
 
 std::string
-JsonUtil::etString(const Json::Value& json, const std::string& name, const std::string& default_value) {
+JsonUtil::getString(const Json::Value& json, const std::string& name, const std::string& default_value) {
 	if(!json.isMember(name)) {
 		return default_value;
 	}
