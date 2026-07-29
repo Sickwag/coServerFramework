@@ -173,7 +173,7 @@ class Array {
 		if(speed == (uint64_t)-1) {
 			os.write((const char*)_data, sizeof(T) * _size);
 		} else {
-			WriteFixToStreamWithSpeed(os, (const char*)_data, sizeof(T) * _size, speed);
+			writeFixToStreamWithSpeed(os, (const char*)_data, sizeof(T) * _size, speed);
 		}
 		return (bool)os;
 	}
@@ -181,16 +181,16 @@ class Array {
 	bool readFrom(std::istream& is, uint64_t speed = -1) {
 		do {
 			try {
-				if(!ReadFromStream(is, _size)) {
+				if(!readFromStream(is, _size)) {
 					break;
 				}
 				_data = (T*)realloc(_data, _size * sizeof(T));
 				if(speed == (uint64_t)-1) {
-					if(!ReadFixFromStream(is, (char*)_data, _size * sizeof(T))) {
+					if(!readFixFromStream(is, (char*)_data, _size * sizeof(T))) {
 						break;
 					}
 				} else {
-					if(!ReadFixFromStreamWithSpeed(is, (char*)_data, _size * sizeof(T), speed)) {
+					if(!readFixFromStreamWithSpeed(is, (char*)_data, _size * sizeof(T), speed)) {
 						break;
 					}
 				}

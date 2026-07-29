@@ -1,3 +1,4 @@
+#include "datastruct/array.h"
 #include "datastruct/bitmap.h"
 #include "datastruct/cache_status.h"
 #include "datastruct/dict.h"
@@ -107,6 +108,50 @@ void testRoaring() {
 	AZZATO_LOG_INFO(g_logger) << "RoaringBitmap ok";
 }
 
+void testHashMultimap() {
+	azzato::HashMultimap<int, int> mm;
+	mm.insert(1, 10);
+	mm.insert(1, 20);
+	mm.insert(2, 30);
+	std::vector<int> vs;
+	assert(mm.get(1, vs));
+	assert(vs.size() == 2);
+	assert(mm.get(2, vs));
+	assert(vs.size() == 1);
+	AZZATO_LOG_INFO(g_logger) << "HashMultimap ok";
+}
+
+void testTimedCache() {
+	azzato::TimedCache<int, int> cache;
+	cache.set(1, 100, 1000);
+	int v = 0;
+	assert(cache.get(1, v));
+	assert(v == 100);
+	AZZATO_LOG_INFO(g_logger) << "TimedCache ok";
+}
+
+void testTimedLruCache() {
+	azzato::TimedLruCache<int, int> cache;
+	cache.setMaxSize(10);
+	cache.set(1, 100, 1000);
+	int v = 0;
+	assert(cache.get(1, v));
+	assert(v == 100);
+	AZZATO_LOG_INFO(g_logger) << "TimedLruCache ok";
+}
+
+void testArray() {
+	azzato::datastruct::Array<int> arr(4);
+	arr[0] = 1;
+	arr[1] = 2;
+	arr.set(2, 3);
+	arr.set(3, 4);
+	assert(arr.size() == 4);
+	assert(arr[0] == 1);
+	assert(arr.get(3) == 4);
+	AZZATO_LOG_INFO(g_logger) << "Array ok";
+}
+
 int main() {
 	AZZATO_LOG_INFO(g_logger) << "test_ds begin";
 	testHashMap();
@@ -116,6 +161,10 @@ int main() {
 	testUtil();
 	testBitmap();
 	testRoaring();
+	testHashMultimap();
+	testTimedCache();
+	testTimedLruCache();
+	testArray();
 	AZZATO_LOG_INFO(g_logger) << "test_ds over";
 	return 0;
 }
