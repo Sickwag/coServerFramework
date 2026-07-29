@@ -5,6 +5,10 @@
 #include "utils/hash_util.h"
 #include "utils/macro.h"
 
+#include <sstream>
+#include <string>
+#include <vector>
+
 namespace azzato {
 
 static ConfigVar<std::map<std::string, std::map<std::string, std::string>>>::ptr g_redis =
@@ -52,7 +56,10 @@ redisReply* RedisReplyClone(redisReply* r) {
 	return c;
 }
 
-Redis::Redis() { _type = IRedis::REDIS; }
+Redis::Redis() {
+	_type		= IRedis::REDIS;
+	_cmdTimeout = {0, 0};
+}
 
 Redis::Redis(const std::map<std::string, std::string>& conf) {
 	_type	   = IRedis::REDIS;
@@ -87,10 +94,11 @@ bool Redis::connect(const std::string& ip, int port, uint64_t ms) {
 	timeval tv = {(int)ms / 1000, (int)ms % 1000 * 1000};
 	auto	c  = redisConnectWithTimeout(ip.c_str(), port, tv);
 	if(c) {
+		_context.reset(c, redisFree);
+
 		if(_cmdTimeout.tv_sec || _cmdTimeout.tv_usec) {
 			setTimeout(_cmdTimeout.tv_sec * 1000 + _cmdTimeout.tv_usec / 1000);
 		}
-		_context.reset(c, redisFree);
 
 		if(!_passwd.empty()) {
 			auto r = (redisReply*)redisCommand(c, "auth %s", _passwd.c_str());
@@ -130,23 +138,16 @@ bool Redis::setTimeout(uint64_t v) {
 }
 
 ReplyPtr Redis::cmd(const std::string& command) {
-	auto r = (redisReply*)redisCommand(_context.get(), "%s", command.c_str());
-	if(!r) {
-		if(_logEnable) {
-			AZZATO_LOG_ERROR(systemLogger) << "redisCommand error: (" << command << ")(" << _host << ":"
-										   << _port << ")(" << _name << ")";
-		}
+	std::vector<std::string> argv;
+	std::istringstream		 iss(command);
+	std::string				 token;
+	while(iss >> token) {
+		argv.push_back(std::move(token));
+	}
+	if(argv.empty()) {
 		return nullptr;
 	}
-	ReplyPtr rt(r, freeReplyObject);
-	if(r->type != REDIS_REPLY_ERROR) {
-		return rt;
-	}
-	if(_logEnable) {
-		AZZATO_LOG_ERROR(systemLogger) << "redisCommand error: (" << command << ")(" << _host << ":" << _port
-									   << ")(" << _name << ")" << ": " << r->str;
-	}
-	return nullptr;
+	return cmd(argv);
 }
 
 ReplyPtr Redis::cmd(const std::vector<std::string>& argv) {
@@ -203,7 +204,10 @@ int Redis::appendCmd(const std::vector<std::string>& argv) {
 	return redisAppendCommandArgv(_context.get(), argv.size(), &v[0], &l[0]);
 }
 
-RedisCluster::RedisCluster() { _type = IRedis::REDIS_CLUSTER; }
+RedisCluster::RedisCluster() {
+	_type		= IRedis::REDIS_CLUSTER;
+	_cmdTimeout = {0, 0};
+}
 
 RedisCluster::RedisCluster(const std::map<std::string, std::string>& conf) {
 	_type	   = IRedis::REDIS_CLUSTER;
@@ -276,23 +280,16 @@ bool RedisCluster::setTimeout(uint64_t ms) {
 }
 
 ReplyPtr RedisCluster::cmd(const std::string& command) {
-	auto r = (redisReply*)redisClusterCommand(_context.get(), "%s", command.c_str());
-	if(!r) {
-		if(_logEnable) {
-			AZZATO_LOG_ERROR(systemLogger) << "redisCommand error: (" << command << ")(" << _host << ":"
-										   << _port << ")(" << _name << ")";
-		}
+	std::vector<std::string> argv;
+	std::istringstream		 iss(command);
+	std::string				 token;
+	while(iss >> token) {
+		argv.push_back(std::move(token));
+	}
+	if(argv.empty()) {
 		return nullptr;
 	}
-	ReplyPtr rt(r, freeReplyObject);
-	if(r->type != REDIS_REPLY_ERROR) {
-		return rt;
-	}
-	if(_logEnable) {
-		AZZATO_LOG_ERROR(systemLogger) << "redisCommand error: (" << command << ")(" << _host << ":" << _port
-									   << ")(" << _name << ")" << ": " << r->str;
-	}
-	return nullptr;
+	return cmd(argv);
 }
 
 ReplyPtr RedisCluster::cmd(const std::vector<std::string>& argv) {

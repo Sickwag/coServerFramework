@@ -62,7 +62,6 @@ target_include_directories(azzato
 	PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${AZZATO_GENERATED_DIR}
-	PRIVATE
 	${MYSQL_INCLUDE_DIR}
 	${HIREDIS_VIP_DIR}
 )
