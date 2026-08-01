@@ -1,6 +1,8 @@
 #include "zk_client.h"
 #include <zookeeper/zookeeper.h>
 
+#include <cstring>
+
 namespace azzato {
 
 // static const int CREATED = ZOO_CREATED_EVENT;
@@ -78,8 +80,15 @@ int32_t ZKClient::create(const std::string&		  path,
 						 std::string&			  new_path,
 						 const struct ACL_vector* acl,
 						 int					  flags) {
-	return zoo_create(
-		_handle, path.c_str(), val.c_str(), val.size(), acl, flags, &new_path[0], new_path.size());
+	if(new_path.size() < 256) {
+		new_path.resize(256);
+	}
+	int rt =
+		zoo_create(_handle, path.c_str(), val.c_str(), val.size(), acl, flags, &new_path[0], new_path.size());
+	if(rt == ZOK) {
+		new_path.resize(strlen(new_path.c_str()));
+	}
+	return rt;
 }
 
 int32_t ZKClient::exists(const std::string& path, bool watch, Stat* stat) {
@@ -91,7 +100,10 @@ int32_t ZKClient::del(const std::string& path, int version) {
 }
 
 int32_t ZKClient::get(const std::string& path, std::string& val, bool watch, Stat* stat) {
-	int		len = val.size();
+	if(val.size() < 256) {
+		val.resize(256);
+	}
+	int		len = static_cast<int>(val.size());
 	int32_t rt	= zoo_get(_handle, path.c_str(), watch, &val[0], &len, stat);
 	if(rt == ZOK) {
 		val.resize(len);

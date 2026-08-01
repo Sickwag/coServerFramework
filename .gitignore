@@ -127,3 +127,6 @@ Desktop.ini
 
 # Irrelevant files
 **/LearnProcess.md
+
+# Private test-service credentials (never commit)
+bin/conf/services.yml
